@@ -1,0 +1,8 @@
+data/TWiki/SetGetPlugin.txt 0644
+data/TWiki/VarGET.txt 0644
+data/TWiki/VarSET.txt 0644
+data/TWiki/VarSETGETDUMP.txt 0644
+lib/TWiki/Plugins/SetGetPlugin.pm 0444
+lib/TWiki/Plugins/SetGetPlugin/Core.pm 0444
+test/unit/SetGetPlugin/SetGetPluginTests.pm 0444
+test/unit/SetGetPlugin/SetGetPluginSuite.pm 0444

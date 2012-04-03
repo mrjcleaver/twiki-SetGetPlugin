@@ -1,0 +1,245 @@
+%META:TOPICINFO{author="PeterThoeny" date="1325884249" format="1.1" reprev="1.1" version="1.1"}%
+---+!! !SetGetPlugin
+<!--
+   Contributions to this plugin are appreciated. Please update the plugin page at
+   http://twiki.org/cgi-bin/view/Plugins/SetGetPlugin or provide feedback at
+   http://twiki.org/cgi-bin/view/Plugins/SetGetPluginDev.
+   If you are a TWiki contributor please update the plugin in the SVN repository.
+-->
+<sticky>
+<div style="float:right; background-color:#EBEEF0; margin:0 0 20px 20px; padding: 0 10px 0 10px;">
+%TOC{title="Page contents"}%
+</div>
+</sticky>
+%SHORTDESCRIPTION%
+
+---++ Introduction
+
+Use =%<nop>SET{}%= to store arbitrary text in a named variable, and reuse it with =%<nop>GET{}%= later on within the topic or an included topics. By default, variables live only during topic rendering time, e.g. they do not persist between topic views. It is also possible to remember the variables between topic views, however they are not version controlled like other content in TWiki.
+
+=%<nop>SET{}%= and =%<nop>GET{}%= can be nested inside other TWiki variables and get handled as expected, e.g. inside out, and left to right.
+
+Alternatives to this plugin are:
+
+   * TWiki preferences settings: Can be defined on a site level (%USERSWEB%.TWikiPreferences), web level (WebPreferences) and topic level. Preferences settings persist until changed.
+   * %SYSTEMWEB%.SpreadSheetPlugin variables: Variables can be set with =%<nop>CALC{$SET(some_name, anything)}%= and retrieved with =$GET()=. These variables persist during page rendering time. A limitation of =%<nop>CALC{}= is that it does not follow the standard TWiki variable evaluation order (nesting inside out, left to right).
+
+---++ Syntax Rules
+
+%INCLUDE{"VarSET"}%
+
+#RememberNotes
+%X% __Important notes when using the remember option:__
+   * Use descriptive variable names: Keep in mind that the remember option sets a variable with TWiki-global scope, e.g. for all pages and all users. To avoid name clashes, use a descriptive variable name which might include web &amp; topic name and user or group name. For example, instead of variable named ="campaign"=, use a more descriptive name ="Marketing-Europe-%SERVERTIME{$year}%-Campaign"=.
+   * Do not store confidential content: The remembered variables are not aware of access control. If a user stores access controlled content in a variable, anyone who knows the variable name or uses the SETGETDUMP variable can read the content.
+   * Variables are not version controlled, e.g. you do not get the audit trail you have elsewhere in TWiki (topics, attachments, meta data, etc). Consider storing content in [[%SYSTEMWEB%.TWikiForms][TWiki form fields]] if you need an audit trail.
+
+%INCLUDE{"VarGET"}%
+
+%INCLUDE{"VarSETGETDUMP"}%
+
+#SetGetExamples
+---++ Examples
+
+---+++ Set several times
+
+A variable can be set and used several times.
+
+<table><tr><td valign="top">
+__Raw text:__
+
+<verbatim>
+   * Set "demo" to "uno": %SET{ "demo" value="uno" }%
+   * Get "demo": %GET{ "demo" }%
+   * Set "demo" to "due": %SET{ "demo" value="due" }%
+   * Get "demo": %GET{ "demo" }%
+   * Set "demo" to "tre": %SET{ "demo" value="tre" }%
+   * Get "demo": %GET{ "demo" }%
+</verbatim>
+
+</td><td>&nbsp;</td><td valign="top">
+__Rendered text:__
+
+   * Set "demo" to "uno": %SET{ "demo" value="uno" }%
+   * Get "demo": %GET{ "demo" }%
+   * Set "demo" to "due": %SET{ "demo" value="due" }%
+   * Get "demo": %GET{ "demo" }%
+   * Set "demo" to "tre": %SET{ "demo" value="tre" }%
+   * Get "demo": %GET{ "demo" }%
+</td></tr></table>
+
+---+++ Search and save result
+
+A SEARCH result can be assigned to a variable for later use. This can be useful for performance reasons if you need the result multiple times. The result can also be post-processed, such as with a =[[SpreadSheetPlugin#FuncLISTMAP][$LISTMAP()]]= of the SpreadSheetPlugin.
+
+<table><tr><td valign="top">
+__Raw text:__
+
+<verbatim>
+%SET{
+ "result"
+ value="%SEARCH{
+  "."
+  topic="*Skin"
+  nonoise="on"
+  format="$topic"
+  separator=", "
+ }%"
+}%
+   * Result: %GET{result}%
+   * Again: %GET{result}%
+</verbatim>
+
+</td><td>&nbsp;</td><td valign="top">
+__Rendered text:__
+
+%SET{
+ "result"
+ value="%SEARCH{
+  "."
+  topic="*Skin"
+  nonoise="on"
+  format="$topic"
+  separator=", "
+ }%"
+}%
+   * Result: %GET{result}%
+   * Again: %GET{result}%
+</td></tr></table>
+
+---+++ Last topic view
+
+In a topic, set a variable with the remember flag set that stores the current time. Add also a GET before the SET, it will show the time the topic has last been viewed.
+
+<table><tr><td valign="top">
+__Raw text:__
+
+<verbatim>
+   * Last view: %GET{ "SetGetPlugin-lastview" }%
+   * Now: %SET{ "SetGetPlugin-lastview" remember="1" 
+      value="%SERVERTIME{$year-$mo-$day $hou:$min:$sec}%"
+     }%
+     %GET{ "SetGetPlugin-lastview" }%
+</verbatim>
+
+</td><td>&nbsp;</td><td valign="top">
+__Rendered text:__
+
+   * Last view: %GET{ "SetGetPlugin-lastview" }%
+   * Now: %SET{ "SetGetPlugin-lastview" remember="1" 
+      value="%SERVERTIME{$year-$mo-$day $hou:$min:$sec}%"
+     }%
+     %GET{ "SetGetPlugin-lastview" }%
+</td></tr></table>
+
+#MyMood
+---+++ Remember my mood
+
+This example shows how you can remember the mood of users. The form shows a picklist to select a mood. The mood is stored persistently per user, and shown.
+
+<table><tr><td valign="top">
+__Raw text:__
+
+<verbatim>
+%IF{
+ "defined 'mood'"
+ then="$percntSET{
+  \"SetGetPlugin-mood-%WIKINAME%\" remember=\"1\" 
+  value=\"%URLPARAM{mood}%\"
+ }$percnt"
+}%
+My current mood:
+&nbsp; %GET{ "SetGetPlugin-mood-%WIKINAME%" }%
+for %WIKIUSERNAME%
+
+<form action="%SCRIPTURL{view}%/%WEB%/%TOPIC%#MyMood">
+Change my mood: <select name="mood">
+<option>%URLPARAM{mood}%</option>
+<option>:-D</option> <option>:-)</option>
+<option>:-I</option> <option>:-(</option>
+<option>:mad:</option>
+</select>
+<input type="submit" value="Set" class="twikiSubmit" />
+</form>
+</verbatim>
+
+</td><td>&nbsp;</td><td valign="top">
+__Rendered text:__
+
+%IF{
+ "defined 'mood'"
+ then="$percntSET{
+  \"SetGetPlugin-mood-%WIKINAME%\" remember=\"1\" 
+  value=\"%URLPARAM{mood}%\"
+ }$percnt"
+}%
+My current mood:
+&nbsp; %GET{ "SetGetPlugin-mood-%WIKINAME%" }%
+for %WIKIUSERNAME%
+
+<form action="%SCRIPTURL{view}%/%WEB%/%TOPIC%#MyMood">
+Change my mood: <select name="mood">
+<option>%URLPARAM{mood}%</option>
+<option>:-D</option> <option>:-)</option>
+<option>:-I</option> <option>:-(</option>
+<option>:mad:</option>
+</select>
+<input type="submit" value="Set" class="twikiSubmit" />
+</form>
+</td></tr></table>
+
+---++ Plugin Settings
+
+Plugin settings are stored as preferences variables. To reference a plugin setting write ==%<nop>&lt;plugin&gt;_&lt;setting&gt;%==, i.e. ==%<nop>NEWPLUGIN_SHORTDESCRIPTION%==
+
+   * One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
+      * Set SHORTDESCRIPTION = Set and get variables in topics, optionally persistently across topic views
+
+   * Debug plugin: (See output in =data/debug.txt=)
+      * Set DEBUG = 0
+
+---++ Plugin Installation Instructions
+
+__Note:__ You do not need to install anything on the browser to use this plugin. The following instructions are for the administrator who installs the plugin on the TWiki server.
+
+   * For an __automated installation__, run the [[%SCRIPTURL{configure}%][configure]] script and follow "Find More Extensions" in the in the __Extensions__ section.
+
+   * Or, follow these __manual installation__ steps:
+      * Download the ZIP file from the Plugins home (see below).
+      * Unzip ==%TOPIC%.zip== in your twiki installation directory. Content:
+        | *File:* | *Description:* |
+        | ==data/TWiki/%TOPIC%.txt== | Plugin topic |
+        | ==data/TWiki/VarGET.txt== | GET documentation |
+        | ==data/TWiki/VarSET.txt== | SET documentation |
+        | ==data/TWiki/VarSETGETDUMP.txt== | SETGETDUMP documentation |
+        | ==lib/TWiki/Plugins/%TOPIC%.pm== | Plugin Perl module |
+        | ==lib/TWiki/Plugins/%TOPIC%/Core.pm== | Core Perl module |
+      * Set the ownership of the extracted directories and files to the webserver user.
+
+   * Plugin __configuration and testing__:
+      * Run the [[%SCRIPTURL{configure}%][configure]] script and enable the plugin in the __Plugins__ section.
+      * Test if the installation was successful: The next bullet should show: =Result: Yes, it works!= %SET{ "test" value="Yes, it works!" }%
+         * Result: %GET{ "test" }%
+
+---++ Plugin Info
+
+|  Plugin Author: | TWiki:Main.PeterThoeny |
+|  Copyright: | &copy; 2010-2012 TWiki:Main.PeterThoeny <br /> &copy; 2010-2012 TWiki:TWiki.TWikiContributor |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public Licen:se]]) |
+|  Plugin Version: | 2012-01-06 |
+|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  2012-01-06: | TWikibug:Item6828: Removing write to persistent if already exists, and adding data dump -- TWiki:Main.AaronLWalker |
+|  2011-07-09: | TWikibug:Item6725: Change global package variables from "use vars" to "our" |
+|  2011-04-04: | TWikibug:Item6638: Small doc improvements |
+|  2011-03-26: | TWikibug:Item6670: Make variables persistent across topic invocations |
+|  2010-10-17: | TWikibug:Item6597: Initial version |
+|  TWiki Dependency: | $TWiki::Plugins::VERSION 1.1 |
+|  CPAN Dependencies: | none |
+|  Other Dependencies: | none |
+|  Perl Version: | 5.005 |
+|  [[TWiki:Plugins/Benchmark][Benchmarks]]: | %SYSTEMWEB%.GoodStyle 100%, %SYSTEMWEB%.FormattedSearch 99%, %TOPIC% 99% |
+|  Plugin Home: | http://TWiki.org/cgi-bin/view/Plugins/SetGetPlugin |
+|  Feedback: | http://TWiki.org/cgi-bin/view/Plugins/SetGetPluginDev |
+|  Appraisal: | http://TWiki.org/cgi-bin/view/Plugins/SetGetPluginAppraisal |
+
+__Related Topics:__ VarSET, VarGET, %SYSTEMWEB%.TWikiPlugins, %SYSTEMWEB%.DeveloperDocumentationCategory, %SYSTEMWEB%.AdminDocumentationCategory, %SYSTEMWEB%.TWikiPreferences, SpreadSheetPlugin
