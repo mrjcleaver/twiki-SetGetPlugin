@@ -27,9 +27,11 @@ sub set_up {
     $this->{target_web2} = "$this->{test_web}Target2";
     $this->{target_topic} = "$this->{test_topic}Target";
     $this->{twiki}->{store}->createWeb(
-        $this->{twiki}->{user}, $this->{target_web});
+        $this->{twiki}->{user}, $this->{target_web}
+    );
     $this->{twiki}->{store}->createWeb(
-        $this->{twiki}->{user}, $this->{target_web2});
+        $this->{twiki}->{user}, $this->{target_web2}
+    );
 }
 
 sub tear_down {
