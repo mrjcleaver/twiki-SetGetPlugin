@@ -1,0 +1,146 @@
+Options: -clean
+exporting TWIKI_ASSERTS=1 for extra checking; disable by exporting TWIKI_ASSERTS=0
+Assert checking on 1
+Running SetGetPluginSuite
+Running SetGetPluginTests
+	SetGetPluginTests::test_set_volatile
+	SetGetPluginTests::test_set_scope_not_remembered_does_not_need_to_be_written
+	SetGetPluginTests::test_set_scope_remember_bad_scope_needs_to_be_written
+*** 
+key: remembered_scoped, value: v1 <br />
+ at SetGetPlugin//SetGetPluginTests.pm line 227
+	SetGetPluginTests::test_set_scope_remember_bad_scope_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea33b3f8)', 'HASH(0x7f9eea5adff8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}key: remembered_scoped, value: v1 <br />\x{a} at SetGetPlugin//S...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}key: remembered_scoped, value: v1 <br />\x{a} at SetGetPlugin//S...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}key: remembered_scoped, value: v1 <br />\x{a} at SetGetPlugin//S...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7f9eea23eae8)', '', 'key: remembered_scoped, value: v1 <br />\x{a}') called at SetGetPlugin//SetGetPluginTests.pm line 227
+	SetGetPluginTests::test_set_scope_remember_bad_scope_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea33b3f8)', 'HASH(0x7f9eea5adff8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+	SetGetPluginTests::test_set_namespace_volatile_should_be_ignored
+	SetGetPluginTests::test_set_doesnt_care_about_web
+	SetGetPluginTests::test_set_scope_remember_needs_to_be_written
+*** 
+Expected:'v1'
+ But got:'v2'
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f9eea23eae8)', 'v1', 'v2') called at SetGetPlugin//SetGetPluginTests.pm line 208
+	SetGetPluginTests::test_set_scope_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea4e2f28)', 'HASH(0x7f9eea44f2b8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7f9eea23eae8)', '', 'Expected:\'v1\'\x{a} But got:\'v2\'\x{a}') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f9eea23eae8)', 'v1', 'v2') called at SetGetPlugin//SetGetPluginTests.pm line 208
+	SetGetPluginTests::test_set_scope_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea4e2f28)', 'HASH(0x7f9eea44f2b8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+	SetGetPluginTests::test_set_remember
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written
+*** 
+Expected:'v0'
+ But got:''
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f9eea23eae8)', 'v0', '') called at SetGetPlugin//SetGetPluginTests.pm line 171
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea441620)', 'HASH(0x7f9eea5d7df0)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'v0\'\x{a} But got:\'\'\x{a} at /Volumes/Storage/martincle...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'v0\'\x{a} But got:\'\'\x{a} at /Volumes/Storage/martincle...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'v0\'\x{a} But got:\'\'\x{a} at /Volumes/Storage/martincle...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7f9eea23eae8)', '', 'Expected:\'v0\'\x{a} But got:\'\'\x{a}') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f9eea23eae8)', 'v0', '') called at SetGetPlugin//SetGetPluginTests.pm line 171
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea441620)', 'HASH(0x7f9eea5d7df0)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+3 failures
+SetGetPluginTests::test_set_scope_remember_bad_scope_needs_to_be_written
+
+key: remembered_scoped, value: v1 <br />
+ at SetGetPlugin//SetGetPluginTests.pm line 227
+	SetGetPluginTests::test_set_scope_remember_bad_scope_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea33b3f8)', 'HASH(0x7f9eea5adff8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}key: remembered_scoped, value: v1 <br />\x{a} at SetGetPlugin//S...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}key: remembered_scoped, value: v1 <br />\x{a} at SetGetPlugin//S...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}key: remembered_scoped, value: v1 <br />\x{a} at SetGetPlugin//S...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7f9eea23eae8)', '', 'key: remembered_scoped, value: v1 <br />\x{a}') called at SetGetPlugin//SetGetPluginTests.pm line 227
+	SetGetPluginTests::test_set_scope_remember_bad_scope_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea33b3f8)', 'HASH(0x7f9eea5adff8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+---------------------------
+SetGetPluginTests::test_set_scope_remember_needs_to_be_written
+
+Expected:'v1'
+ But got:'v2'
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f9eea23eae8)', 'v1', 'v2') called at SetGetPlugin//SetGetPluginTests.pm line 208
+	SetGetPluginTests::test_set_scope_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea4e2f28)', 'HASH(0x7f9eea44f2b8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7f9eea23eae8)', '', 'Expected:\'v1\'\x{a} But got:\'v2\'\x{a}') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f9eea23eae8)', 'v1', 'v2') called at SetGetPlugin//SetGetPluginTests.pm line 208
+	SetGetPluginTests::test_set_scope_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea4e2f28)', 'HASH(0x7f9eea44f2b8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+---------------------------
+SetGetPluginTests::test_set_namespace_remember_needs_to_be_written
+
+Expected:'v0'
+ But got:''
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f9eea23eae8)', 'v0', '') called at SetGetPlugin//SetGetPluginTests.pm line 171
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea441620)', 'HASH(0x7f9eea5d7df0)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'v0\'\x{a} But got:\'\'\x{a} at /Volumes/Storage/martincle...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'v0\'\x{a} But got:\'\'\x{a} at /Volumes/Storage/martincle...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'v0\'\x{a} But got:\'\'\x{a} at /Volumes/Storage/martincle...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7f9eea23eae8)', '', 'Expected:\'v0\'\x{a} But got:\'\'\x{a}') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f9eea23eae8)', 'v0', '') called at SetGetPlugin//SetGetPluginTests.pm line 171
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7f9eea23eae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f9eea441620)', 'HASH(0x7f9eea5d7df0)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f9eea0277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+5 of 8 test cases passed
