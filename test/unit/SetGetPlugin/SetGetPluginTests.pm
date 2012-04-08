@@ -14,6 +14,10 @@ use Error qw( :try );
 
 # cd installdir/core/test/unit/
 # perl ../bin/TestRunner.pl -clean SetGetPlugin/SetGetPluginSuite.pm > SetGetPlugin/test-run-output/1.out 2>&1
+# Use graphical debugger ptkdb and a breakpoint inserted into code
+# using $DB::single = 1; 
+# http://stackoverflow.com/questions/4691448/can-i-insert-break-point-into-source-perl-program
+
 
 my $debug = 1;
 
@@ -130,7 +134,7 @@ sub test_set_doesnt_care_about_web {
 
 }
 
-sub test_set_namespace_volatile_should_fail {
+sub test_set_namespace_volatile_should_be_ignored {
     my $this = shift;
     
     my $core = new TWiki::Plugins::SetGetPlugin::Core( $debug );
@@ -139,13 +143,13 @@ sub test_set_namespace_volatile_should_fail {
     
     my $actual = $this->do_get($core, {_DEFAULT => "volatile", namespace=> "ns1"});
     my $actual2 = $this->do_get($core, {_DEFAULT => "volatile", namespace=> "ns2"});
-
-    $this->assert('', $this->do_dump($core)); # There should be no response, this was a transient set    
-    $this->assert_equals('v1', $actual);
+    
+    $this->assert_equals('', $this->do_dump($core)); # There should be no response, this was a transient set    
+    $this->assert_equals('v2', $actual);
     $this->assert_equals('v2', $actual);
 }
 
-sub test_set_namespace_remember_should_fail {
+sub test_set_namespace_remember_needs_to_be_written {
     my $this = shift;
     
     my $core = new TWiki::Plugins::SetGetPlugin::Core( $debug );
@@ -161,7 +165,7 @@ sub test_set_namespace_remember_should_fail {
 
 }
 
-sub test_set_scope_should_fail {
+sub test_set_scope_not_remembered_does_not_need_to_be_written {
     my $this = shift;
     
     my $core = new TWiki::Plugins::SetGetPlugin::Core( $debug );
@@ -171,11 +175,11 @@ sub test_set_scope_should_fail {
     my $actual = $this->do_get($core, {_DEFAULT => "volatile", scope=> "sc1"});
     my $actual2 = $this->do_get($core, {_DEFAULT => "volatile", scope=> "sc2"});
 
-    $this->assert_equals('v1', $actual);
+    $this->assert_equals('v2', $actual); # because no remember flag means scope not needed
     $this->assert_equals('v2', $actual);
 }
 
-sub test_set_scope_remember_should_fail {
+sub test_set_scope_remember_needs_to_be_written {
     my $this = shift;
     
     my $core = new TWiki::Plugins::SetGetPlugin::Core( $debug );
