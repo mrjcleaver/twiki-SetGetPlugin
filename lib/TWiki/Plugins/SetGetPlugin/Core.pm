@@ -66,6 +66,7 @@ sub VarDUMP
         $sep = "\n";
     }
 
+    $DB::single = 1;
     $sep =~ s/\$n/\n/g;
     while( my ($k, $v) = each %{$this->{PersistentVars}} ) {
         $hold = $format;
@@ -91,7 +92,12 @@ sub VarGET
         TWiki::Func::writeDebug( "-   set volatile -> $value" ) if $this->{Debug};
 
     } elsif( defined $this->{PersistentVars}{$name} ) {
-        $value = $this->{PersistentVars}{$name};
+        my $namespace = $params->{namespace} || '';
+        if ($namespace) {
+            $value = $this->{PersistentVars}{$namespace}{$name};
+        } else {
+            $value = $this->{PersistentVars}{$name};
+        }
         TWiki::Func::writeDebug( "-   get persistent -> $value" ) if $this->{Debug};
 
     } elsif( defined $params->{default} ) {
@@ -110,13 +116,16 @@ sub VarSET
     my $value = $params->{value};
     return '' unless( defined $value );
     TWiki::Func::writeDebug( "- SetGetPlugin SET ($name = $value)" ) if $this->{Debug};
-    
+    my $namespace = $params->{namespace} || '';
+
     my $remember = $params->{remember} || 0;
     if( $remember && ! ( $remember =~ /^off$/i ) ) {
-        if( defined $this->{PersistentVars}{$name} && $value eq $this->{PersistentVars}{$name} ) {
-                TWiki::Func::writeDebug( "-   eliding set persistent -> $value" ) if $this->{Debug};
+        $DB::single = 1;
+        if( (defined $this->{PersistentVars}{$name}) 
+            && ($value eq $this->{PersistentVars}{$name}) ) {
+                TWiki::Func::writeDebug( "-   eliding (as already set) persistent -> $value" ) if $this->{Debug};
         } else {
-                $this->_savePersistentVar( $name, $value );
+                $this->_savePersistentVar( $name, $value, $namespace );
         }
 
     } else {
@@ -127,6 +136,9 @@ sub VarSET
 }
 
 # =========================
+# Note on namespaces:
+# We need a policy for which namespace to place unname-spaced SETS.
+# e.g. we could place them into DEFAULT::
 sub _loadPersistentVars
 {
     my ( $this ) = @_;
@@ -145,11 +157,18 @@ sub _loadPersistentVars
 # =========================
 sub _savePersistentVar
 {
-    my ( $this, $name, $value ) = @_;
-
+    my ( $this, $name, $value, $namespace ) = @_;
     # FIXME: Do atomic transaction to avoid race condition
     $this->_loadPersistentVars();            # re-load latest from disk in case updated
-    $this->{PersistentVars}{$name} = $value; # set variable
+
+
+    if ($namespace) {
+        $DB::single = 1;
+        $this->{PersistentVars}{$namespace}{$name} = $value;
+    } else {
+        $this->{PersistentVars}{$name} = $value; # set variable    
+    }
+    
     my $text = Data::Dumper->Dump([$this->{PersistentVars}], [qw(PersistentVars)]);
     TWiki::Func::saveFile( $this->{StoreFile}, $text ) ;
     $this->{StoreTimeStamp} = ( stat( $this->{StoreFile} ) )[9];
