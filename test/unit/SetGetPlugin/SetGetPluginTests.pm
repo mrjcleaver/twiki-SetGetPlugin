@@ -160,7 +160,7 @@ sub test_set_remember {
     my $actual = $this->do_get($core,"remember1");
     
     $this->assert_equals('v1', $actual);
-    $this->assert('key: remember1, value: v1 <br />', $this->do_dump($core));
+    $this->assert_equals('key: remember1, value: v1 <br />', $this->do_dump($core));
 }
 
 # set (remember)  from 2 different web affects the same variable in the same file
@@ -205,11 +205,11 @@ sub test_set_namespace_remember_needs_to_be_written {
     $this->do_set($core, {_DEFAULT => "remembered", value => "v1", namespace => "ns1", remember=>"1"});
     $this->do_set($core, {_DEFAULT => "remembered", value => "v2", namespace => "ns2", remember=>"1"});
     
-    my $actual = $this->do_get($core, {_DEFAULT => "volatile", namespace=> "ns1"});
-    my $actual2 = $this->do_get($core, {_DEFAULT => "volatile", namespace=> "ns2"});
-    my $actual_unnamespaced = $this->do_get($core, {_DEFAULT => "volatile"});
+    my $actual = $this->do_get($core, {_DEFAULT => "remembered", namespace=> "ns1"});
+    my $actual2 = $this->do_get($core, {_DEFAULT => "remembered", namespace=> "ns2"});
+    my $actual_unnamespaced = $this->do_get($core, {_DEFAULT => "remembered"});
 
-    $this->assert('key: remembered, value: v1 <br />\nkey: remembered, value: v2 <br />',
+    $this->assert_equals('key: remembered, value: v1 <br />\nkey: remembered, value: v2 <br />',
                   $this->do_dump($core)); # TODO fix up with namespaces
     $this->assert_equals('v0', $actual_unnamespaced);
     $this->assert_equals('v1', $actual);
@@ -235,7 +235,7 @@ Tests with a known good scope and remember=1
 
 =cut
 
-sub test_set_scope_remember_needs_to_be_written {
+sub disabled_test_set_scope_remember_needs_to_be_written {
     my $this = shift;
     
     $TWiki::cfg{SetGetPlugin}{Scopes} = 'sc1, sc2';    
@@ -247,7 +247,7 @@ sub test_set_scope_remember_needs_to_be_written {
     my $actual = $this->do_get($core, {_DEFAULT => "remembered_scoped", scope=> "sc1"});
     my $actual2 = $this->do_get($core, {_DEFAULT => "remembered_scoped", scope=> "sc2"});
 
-    $this->assert('key: remembered_scoped, value: v1 <br />\nkey: remembered_scoped, value: v2 <br />', $this->do_dump($core)); 
+    $this->assert_equals('key: remembered_scoped, value: v1 <br />\nkey: remembered_scoped, value: v2 <br />', $this->do_dump($core)); 
     $this->assert_equals('v1', $actual);
     $this->assert_equals('v2', $actual);
 }
@@ -256,7 +256,7 @@ sub test_set_scope_remember_needs_to_be_written {
 Tests with a known bad scope and remember=1
 =cut
 
-sub test_set_scope_remember_bad_scope_needs_to_be_written {
+sub disabled_test_set_scope_remember_bad_scope_needs_to_be_written {
     my $this = shift;
     
     $TWiki::cfg{SetGetPlugin}{Scopes} = 'ScopeA, ScopeB';
@@ -267,7 +267,7 @@ sub test_set_scope_remember_bad_scope_needs_to_be_written {
     my $actual = $this->do_get($core, {_DEFAULT => "remembered_scoped", scope=> "sc1"});
     # TODO - do we want to log bad accesses?
 
-    $this->assert('', $this->do_dump($core)); 
+    $this->assert_equals('', $this->do_dump($core)); 
     $this->assert_equals('', $actual); # Scope "nonExistantScope" doesn't exist - so no value should be written
 }
 
@@ -278,7 +278,7 @@ sub load_persistent_vars {
         $text =~ /^(.*)$/gs; # untaint, it's safe
         $text = $1;
 
-    $DB::single = 1;
+#    $DB::single = 1;
     
     our $PersistentVars;
     $PersistentVars = eval($text);
@@ -300,7 +300,7 @@ sub test_load_persistent_vars {
     $PersistentVars = load_persistent_vars($tempStoreFile_namespaced);
     print Data::Dumper->Dump([$PersistentVars], [qw(PersistentVars)]);
 
-    $DB::single = 1;
+#    $DB::single = 1;
 
     #my $vars2 = load_into_storable($tempStoreFile_namespaced);
     
