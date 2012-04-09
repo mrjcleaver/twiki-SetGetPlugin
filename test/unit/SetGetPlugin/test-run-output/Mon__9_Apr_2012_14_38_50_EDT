@@ -1,0 +1,89 @@
+Options: -clean
+exporting TWIKI_ASSERTS=1 for extra checking; disable by exporting TWIKI_ASSERTS=0
+Assert checking on 1
+Running SetGetPluginSuite
+Running SetGetPluginTests
+	SetGetPluginTests::test_set_volatile
+	SetGetPluginTests::test_set_scope_not_remembered_does_not_need_to_be_written
+	SetGetPluginTests::test_load_persistent_vars
+$PersistentVars = {
+                    'HoldMilestoneID00153_UNIX' => '1333131708',
+                    'HoldMilestoneID00293_TIME' => '2535',
+                    'MilestoneID00097_BL' => '1333132500',
+                    'HoldMilestoneID00169_UNIX' => '1333149708',
+                    'MilestoneID00078_UNIX' => '1333116558',
+                    'HoldMilestoneID00349_BL' => '1333128300'
+                  };
+$PersistentVars = {
+                    'ns2' => {
+                               'MilestoneID00097_BL' => '1333132500',
+                               'HoldMilestoneID00169_UNIX' => '1333149708'
+                             },
+                    'MilestoneID00078_UNIX' => '1333116558',
+                    'HoldMilestoneID00349_BL' => '1333128300',
+                    'ns1' => {
+                               'HoldMilestoneID00153_UNIX' => '1333131708',
+                               'HoldMilestoneID00293_TIME' => '2535'
+                             }
+                  };
+	SetGetPluginTests::test_set_namespace_volatile_should_be_ignored
+	SetGetPluginTests::test_set_doesnt_care_about_web
+	SetGetPluginTests::test_set_remember
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written
+*** 
+Expected:'key: remembered, value: v1 <br />
+key: remembered, value: v2 <br />
+'
+ But got:'key: ns2, value: HASH(0x7ff0f25bbc50) <br />
+key: remembered, value: v0 <br />
+key: ns1, value: HASH(0x7ff0f25deea0) <br />
+'
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7ff0f219e840)', 'key: remembered, value: v1 <br />\x{a}key: remembered, value: v2 ...', 'key: ns2, value: HASH(0x7ff0f25bbc50) <br />\x{a}key: remembered,...') called at SetGetPlugin//SetGetPluginTests.pm line 212
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7ff0f219e840)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7ff0f25b5d68)', 'HASH(0x7ff0f24c70c8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7ff0f2028bc8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'key: remembered, value: v1 <br />\x{a}key: remembered...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'key: remembered, value: v1 <br />\x{a}key: remembered...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'key: remembered, value: v1 <br />\x{a}key: remembered...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7ff0f219e840)', '', 'Expected:\'key: remembered, value: v1 <br />\x{a}key: remembered,...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7ff0f219e840)', 'key: remembered, value: v1 <br />\x{a}key: remembered, value: v2 ...', 'key: ns2, value: HASH(0x7ff0f25bbc50) <br />\x{a}key: remembered,...') called at SetGetPlugin//SetGetPluginTests.pm line 212
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7ff0f219e840)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7ff0f25b5d68)', 'HASH(0x7ff0f24c70c8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7ff0f2028bc8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+1 failures
+SetGetPluginTests::test_set_namespace_remember_needs_to_be_written
+
+Expected:'key: remembered, value: v1 <br />
+key: remembered, value: v2 <br />
+'
+ But got:'key: ns2, value: HASH(0x7ff0f25bbc50) <br />
+key: remembered, value: v0 <br />
+key: ns1, value: HASH(0x7ff0f25deea0) <br />
+'
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7ff0f219e840)', 'key: remembered, value: v1 <br />\x{a}key: remembered, value: v2 ...', 'key: ns2, value: HASH(0x7ff0f25bbc50) <br />\x{a}key: remembered,...') called at SetGetPlugin//SetGetPluginTests.pm line 212
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7ff0f219e840)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7ff0f25b5d68)', 'HASH(0x7ff0f24c70c8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7ff0f2028bc8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'key: remembered, value: v1 <br />\x{a}key: remembered...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'key: remembered, value: v1 <br />\x{a}key: remembered...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'key: remembered, value: v1 <br />\x{a}key: remembered...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7ff0f219e840)', '', 'Expected:\'key: remembered, value: v1 <br />\x{a}key: remembered,...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7ff0f219e840)', 'key: remembered, value: v1 <br />\x{a}key: remembered, value: v2 ...', 'key: ns2, value: HASH(0x7ff0f25bbc50) <br />\x{a}key: remembered,...') called at SetGetPlugin//SetGetPluginTests.pm line 212
+	SetGetPluginTests::test_set_namespace_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7ff0f219e840)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7ff0f25b5d68)', 'HASH(0x7ff0f24c70c8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7ff0f2028bc8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+6 of 7 test cases passed
