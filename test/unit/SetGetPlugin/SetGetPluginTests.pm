@@ -12,10 +12,11 @@ use TWiki;
 use CGI;
 use Error qw( :try );
 
+# use on a TWiki subversion based checkout (production copies lack the test/ folder)
 # cd installdir/core/test/unit/
-# perl ../bin/TestRunner.pl -clean SetGetPlugin/SetGetPluginSuite.pm > SetGetPlugin/test-run-output/1.out 2>&1
-# Use graphical debugger ptkdb and a breakpoint inserted into code
-# using $DB::single = 1;
+# sh SetGetPlugin/run-test.sh
+# To Use graphical debugger ptkdb and a breakpoint inserted into code
+# use $DB::single = 1;
 # and perl -d:ptkdb ../bin/TestRunner.pl ...
 # http://stackoverflow.com/questions/4691448/can-i-insert-break-point-into-source-perl-program
 
@@ -102,7 +103,6 @@ sub do_set {
 
 sub get_params {
     my ($defaultParams) = @_;
-    #print "get($theParams):  ". ref($theParams)."\n";
     my $params; 
     if (ref ($defaultParams) eq "HASH") {
         $params = $defaultParams;
@@ -160,7 +160,7 @@ sub test_set_remember {
     my $actual = $this->do_get($core,"remember1");
     
     $this->assert_equals('v1', $actual);
-    $this->assert_equals('key: remember1, value: v1 <br />', $this->do_dump($core));
+    $this->assert_equals("key: remember1, value: v1 <br />\n", $this->do_dump($core));
 }
 
 # set (remember)  from 2 different web affects the same variable in the same file
@@ -209,7 +209,7 @@ sub test_set_namespace_remember_needs_to_be_written {
     my $actual2 = $this->do_get($core, {_DEFAULT => "remembered", namespace=> "ns2"});
     my $actual_unnamespaced = $this->do_get($core, {_DEFAULT => "remembered"});
 
-    $this->assert_equals('key: remembered, value: v1 <br />\nkey: remembered, value: v2 <br />',
+    $this->assert_equals("key: remembered, value: v1 <br />\nkey: remembered, value: v2 <br />\n",
                   $this->do_dump($core)); # TODO fix up with namespaces
     $this->assert_equals('v0', $actual_unnamespaced);
     $this->assert_equals('v1', $actual);
@@ -247,7 +247,7 @@ sub disabled_test_set_scope_remember_needs_to_be_written {
     my $actual = $this->do_get($core, {_DEFAULT => "remembered_scoped", scope=> "sc1"});
     my $actual2 = $this->do_get($core, {_DEFAULT => "remembered_scoped", scope=> "sc2"});
 
-    $this->assert_equals('key: remembered_scoped, value: v1 <br />\nkey: remembered_scoped, value: v2 <br />', $this->do_dump($core)); 
+    $this->assert_equals("key: remembered_scoped, value: v1 <br />\nkey: remembered_scoped, value: v2 <br />\n", $this->do_dump($core)); 
     $this->assert_equals('v1', $actual);
     $this->assert_equals('v2', $actual);
 }
