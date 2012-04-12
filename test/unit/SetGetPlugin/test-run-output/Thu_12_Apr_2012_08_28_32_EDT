@@ -1,0 +1,390 @@
+Options: -clean
+exporting TWIKI_ASSERTS=1 for extra checking; disable by exporting TWIKI_ASSERTS=0
+Assert checking on 1
+Running SetGetPluginSuite
+Running SetGetPluginTests
+	SetGetPluginTests::test_undeclared_stores_behaviours
+		Core constructor
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (newstore) actually using store (newstore) in newstore.dat
+		_storeFileForStore (notallowednewstore) actually using store (default) in persistentvars.dat
+		_storeFileForStore (newstore) actually using store (newstore) in newstore.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+========================================================================
+	SetGetPluginTests::test_set_volatile
+		Core constructor
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		SET (SetGetPluginTests_test_set_volatile = v1)$VAR1 = {
+          'value' => 'v1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_volatile'
+        };
+
+		-   set volatile -> v1
+		GET ($VAR1 = {
+          '_DEFAULT' => 'SetGetPluginTests_test_set_volatile'
+        };
+)
+		-   get volatile returning v1
+		DUMP ()
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+========================================================================
+	SetGetPluginTests::test_set_store_remember_needs_to_be_written
+		Core constructor
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		SET (SetGetPluginTests_test_set_store_remember_needs_to_be_written = v1)$VAR1 = {
+          'store' => 'st1',
+          'value' => 'v1',
+          'remember' => '1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_store_remember_needs_to_be_written'
+        };
+
+		_saveStore (st1)
+		_loadStore (st1)
+		_storeFileForStore (st1) actually using store (st1) in st1.dat
+		_storeFileForStore (st1) actually using store (st1) in st1.dat
+		--**SAVING (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/KlgcIMY84d/work_areas/SetGetPlugin/st1.dat) :
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_store_remember_needs_to_be_written' => 'v1'
+                  };
+
+		SET (SetGetPluginTests_test_set_store_remember_needs_to_be_written = v2)$VAR1 = {
+          'store' => 'st2',
+          'value' => 'v2',
+          'remember' => '1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_store_remember_needs_to_be_written'
+        };
+
+		_saveStore (st2)
+		_loadStore (st2)
+		_storeFileForStore (st2) actually using store (st2) in st2.dat
+		_storeFileForStore (st2) actually using store (st2) in st2.dat
+		--**SAVING (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/KlgcIMY84d/work_areas/SetGetPlugin/st2.dat) :
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_store_remember_needs_to_be_written' => 'v2'
+                  };
+
+		GET ($VAR1 = {
+          'store' => 'st1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_store_remember_needs_to_be_written'
+        };
+)
+		-   get persistent returning v2
+		GET ($VAR1 = {
+          'store' => 'st2',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_store_remember_needs_to_be_written'
+        };
+)
+		-   get persistent returning v2
+		_storeFileForStore (st1) actually using store (st1) in st1.dat
+== STOREFILE st1 @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/KlgcIMY84d/work_areas/SetGetPlugin/st1.dat==
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_store_remember_needs_to_be_written' => 'v1'
+                  };
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (st2) actually using store (st2) in st2.dat
+== STOREFILE st2 @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/KlgcIMY84d/work_areas/SetGetPlugin/st2.dat==
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_store_remember_needs_to_be_written' => 'v2'
+                  };
+========================================================================
+*** 
+Expected:'v1'
+ But got:'v2'
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7ff01099e840)', 'v1', 'v2') called at SetGetPlugin//SetGetPluginTests.pm line 280
+	SetGetPluginTests::test_set_store_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7ff01099e840)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7ff01092a230)', 'HASH(0x7ff010a81618)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7ff010828bc8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7ff01099e840)', '', 'Expected:\'v1\'\x{a} But got:\'v2\'\x{a}') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7ff01099e840)', 'v1', 'v2') called at SetGetPlugin//SetGetPluginTests.pm line 280
+	SetGetPluginTests::test_set_store_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7ff01099e840)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7ff01092a230)', 'HASH(0x7ff010a81618)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7ff010828bc8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+	SetGetPluginTests::test_set_namespace_volatile_should_be_ignored
+		Core constructor
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		SET (SetGetPluginTests_test_set_namespace_volatile_should_be_ignored = v1)$VAR1 = {
+          'namespace' => 'ns1',
+          'value' => 'v1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_volatile_should_be_ignored'
+        };
+
+		-   set volatile -> v1
+		SET (SetGetPluginTests_test_set_namespace_volatile_should_be_ignored = v2)$VAR1 = {
+          'namespace' => 'ns2',
+          'value' => 'v2',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_volatile_should_be_ignored'
+        };
+
+		-   set volatile -> v2
+		GET ($VAR1 = {
+          'namespace' => 'ns1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_volatile_should_be_ignored'
+        };
+)
+		-   get volatile returning v2
+		GET ($VAR1 = {
+          'namespace' => 'ns2',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_volatile_should_be_ignored'
+        };
+)
+		-   get volatile returning v2
+		DUMP ()
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+========================================================================
+	SetGetPluginTests::test_set_doesnt_care_about_web
+		Core constructor
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		SET (SetGetPluginTests_test_set_doesnt_care_about_web = v1)$VAR1 = {
+          'value' => 'v1',
+          'remember' => '1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_doesnt_care_about_web'
+        };
+
+		_saveStore (default)
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		--**SAVING (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/LRao521m9d/work_areas/SetGetPlugin/persistentvars.dat) :
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_doesnt_care_about_web' => 'v1'
+                  };
+
+		SET (SetGetPluginTests_test_set_doesnt_care_about_web = v2)$VAR1 = {
+          'value' => 'v2',
+          'remember' => '1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_doesnt_care_about_web'
+        };
+
+		_saveStore (default)
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		--**SAVING (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/LRao521m9d/work_areas/SetGetPlugin/persistentvars.dat) :
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_doesnt_care_about_web' => 'v2'
+                  };
+
+		GET ($VAR1 = {
+          '_DEFAULT' => 'SetGetPluginTests_test_set_doesnt_care_about_web'
+        };
+)
+		-   get persistent returning v2
+		GET ($VAR1 = {
+          '_DEFAULT' => 'SetGetPluginTests_test_set_doesnt_care_about_web'
+        };
+)
+		-   get persistent returning v2
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+== STOREFILE default @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/LRao521m9d/work_areas/SetGetPlugin/persistentvars.dat==
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_doesnt_care_about_web' => 'v2'
+                  };
+========================================================================
+	SetGetPluginTests::test_default_param_works
+		Core constructor
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		GET ($VAR1 = {
+          'default' => 'default_ans',
+          '_DEFAULT' => 'SetGetPluginTests_test_default_param_works'
+        };
+)
+		-   get persistent returning 
+		-   get default returning default_ans
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+========================================================================
+	SetGetPluginTests::test_set_store_not_remembered_does_not_need_to_work
+		Core constructor
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		SET (SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work = v1)$VAR1 = {
+          'store' => 'store1',
+          'value' => 'v1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work'
+        };
+
+		-   set volatile -> v1
+		SET (SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work = v2)$VAR1 = {
+          'store' => 'store2',
+          'value' => 'v2',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work'
+        };
+
+		-   set volatile -> v2
+		GET ($VAR1 = {
+          'store' => 'store1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work'
+        };
+)
+		-   get volatile returning v2
+		GET ($VAR1 = {
+          'store' => 'store2',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work'
+        };
+)
+		-   get volatile returning v2
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+========================================================================
+	SetGetPluginTests::test_set_remember
+		Core constructor
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		SET (SetGetPluginTests_test_set_remember = v1)$VAR1 = {
+          'value' => 'v1',
+          'remember' => '1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_remember'
+        };
+
+		_saveStore (default)
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		--**SAVING (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/MK5HtkAief/work_areas/SetGetPlugin/persistentvars.dat) :
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_remember' => 'v1'
+                  };
+
+		GET ($VAR1 = {
+          '_DEFAULT' => 'SetGetPluginTests_test_set_remember'
+        };
+)
+		-   get persistent returning v1
+		DUMP ()
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+== STOREFILE default @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/MK5HtkAief/work_areas/SetGetPlugin/persistentvars.dat==
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_remember' => 'v1'
+                  };
+========================================================================
+	SetGetPluginTests::test_set_namespace_remember
+		Core constructor
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		SET (SetGetPluginTests_test_set_namespace_remember = v0)$VAR1 = {
+          'value' => 'v0',
+          'remember' => '1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_remember'
+        };
+
+		_saveStore (default)
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		--**SAVING (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/6kKabj2Azk/work_areas/SetGetPlugin/persistentvars.dat) :
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_namespace_remember' => 'v0'
+                  };
+
+		SET (SetGetPluginTests_test_set_namespace_remember = v1)$VAR1 = {
+          'namespace' => 'ns1',
+          'value' => 'v1',
+          'remember' => '1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_remember'
+        };
+
+		_saveStore (default)
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		--**SAVING (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/6kKabj2Azk/work_areas/SetGetPlugin/persistentvars.dat) :
+$PersistentVars = {
+                    'SetGetPluginTests_test_set_namespace_remember' => 'v0',
+                    'ns1' => {
+                               'SetGetPluginTests_test_set_namespace_remember' => 'v1'
+                             }
+                  };
+
+		SET (SetGetPluginTests_test_set_namespace_remember = v2)$VAR1 = {
+          'namespace' => 'ns2',
+          'value' => 'v2',
+          'remember' => '1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_remember'
+        };
+
+		_saveStore (default)
+		_loadStore (default)
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+		--**SAVING (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/6kKabj2Azk/work_areas/SetGetPlugin/persistentvars.dat) :
+$PersistentVars = {
+                    'ns2' => {
+                               'SetGetPluginTests_test_set_namespace_remember' => 'v2'
+                             },
+                    'SetGetPluginTests_test_set_namespace_remember' => 'v0',
+                    'ns1' => {
+                               'SetGetPluginTests_test_set_namespace_remember' => 'v1'
+                             }
+                  };
+
+		GET ($VAR1 = {
+          'namespace' => 'ns1',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_remember'
+        };
+)
+		-   get persistent returning v1
+		GET ($VAR1 = {
+          'namespace' => 'ns2',
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_remember'
+        };
+)
+		-   get persistent returning v2
+		GET ($VAR1 = {
+          '_DEFAULT' => 'SetGetPluginTests_test_set_namespace_remember'
+        };
+)
+		-   get persistent returning v0
+		_storeFileForStore (default) actually using store (default) in persistentvars.dat
+== STOREFILE default @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/6kKabj2Azk/work_areas/SetGetPlugin/persistentvars.dat==
+$PersistentVars = {
+                    'ns2' => {
+                               'SetGetPluginTests_test_set_namespace_remember' => 'v2'
+                             },
+                    'SetGetPluginTests_test_set_namespace_remember' => 'v0',
+                    'ns1' => {
+                               'SetGetPluginTests_test_set_namespace_remember' => 'v1'
+                             }
+                  };
+========================================================================
+1 failures
+SetGetPluginTests::test_set_store_remember_needs_to_be_written
+
+Expected:'v1'
+ But got:'v2'
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7ff01099e840)', 'v1', 'v2') called at SetGetPlugin//SetGetPluginTests.pm line 280
+	SetGetPluginTests::test_set_store_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7ff01099e840)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7ff01092a230)', 'HASH(0x7ff010a81618)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7ff010828bc8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'v1\'\x{a} But got:\'v2\'\x{a} at /Volumes/Storage/martinc...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7ff01099e840)', '', 'Expected:\'v1\'\x{a} But got:\'v2\'\x{a}') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7ff01099e840)', 'v1', 'v2') called at SetGetPlugin//SetGetPluginTests.pm line 280
+	SetGetPluginTests::test_set_store_remember_needs_to_be_written('SetGetPluginTests=HASH(0x7ff01099e840)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7ff01092a230)', 'HASH(0x7ff010a81618)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7ff010828bc8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+8 of 9 test cases passed
