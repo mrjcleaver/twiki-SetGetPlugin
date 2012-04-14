@@ -35,7 +35,7 @@ sub new {
           PersistentVars => undef,
           StoreFileDir  => TWiki::Func::getWorkArea( 'SetGetPlugin' ),
           StoreFileMapping => {
-            "default" => "persistentvars.dat",
+            "defaultStore" => "persistentvars.dat",
           },
           StoreTimeStamps => {
             "default" => 0,
@@ -82,34 +82,27 @@ sub VarDUMP
 {
     my ( $this, $session, $params, $topic, $web ) = @_;
     my $name  = _sanitizeName( $params->{_DEFAULT} );
-    $this->debug( "DUMP ($name)" ) if $this->{Debug};
+    my ($store, $namespace)  = $this->_getStoreAndNamespaceFromParams($params);    
+
+    $this->debug( "DUMP ($store, $namespace, $name)" ) if $this->{Debug};
     #return '' unless( $name );
 
     my $value = '';
     my $hold = '';
-    my $sep = '';
+    my $sep = "\n";
+    my $format = "key: \$key, value: \$value <br />";
 
-    if( defined $params->{format} ) {
-        $format = $params->{format};
-    } else {
-        $format = "key: \$key, value: \$value <br />";
-    }
-
-    if( defined $params->{separator} ) {
-        $sep = $params->{separator};
-    } else {
-        $sep = "\n";
-    }
+    $format = $params->{format} if( defined $params->{format} );
+    $sep = $params->{separator} if( defined $params->{separator} );
 
 #    $DB::single = 1;
     $sep =~ s/\$n/\n/g;
-    while( my ($k, $v) = each %{$this->{PersistentVars}} ) {
+    while( my ($k, $v) = each %{$this->{PersistentVars}{$store}{$namespace}} ) {
         $hold = $format;
         $hold =~ s/\$key/$k/g;
         $hold =~ s/\$value/$v/g;
         $value .= "$hold$sep";
     }
-
     return $value;
 }
 
@@ -126,7 +119,7 @@ sub VarGET
         $value = $this->{VolatileVars}{$name};
         $this->debug( "-   get volatile returning $value" ) if $this->{Debug};
     } else {
-        $value = $this->persistentGet($name, $params);
+        $value = $this->_getPersistentHash($name, $params);
         $this->debug( "-   get persistent returning $value" ) if $this->{Debug};
     }
     
@@ -137,42 +130,56 @@ sub VarGET
     return $value;
 }
 
-sub persistentGet
+sub _getStoreAndNamespaceFromParams
+{
+    my ( $this, $params) = @_;
+
+    my $namespace = $params->{namespace} || 'defaultNamespace';
+    my $store = $params->{store} || 'defaultStore';
+
+    return ($store, $namespace);    
+}
+
+sub _getPersistentHash
 {
     my ($this, $name, $params) = @_;
-    my $value = '';
-    my $namespace = $params->{namespace} || '';
-    if ($namespace) {
-        $value = $this->{PersistentVars}{$namespace}{$name} if ( defined $this->{PersistentVars}{$namespace}{$name} ) ;
-    } else {
-        $value = $this->{PersistentVars}{$name} if ( defined $this->{PersistentVars}{$name} );
-    }
+    my ($store, $namespace)  = $this->_getStoreAndNamespaceFromParams($params);    
+
+    my $value = '';    
+    $value = $this->{PersistentVars}{$store}{$namespace}{$name}
+        if ( defined $this->{PersistentVars}{$store}{$namespace}{$name} ) ;
     return $value;
-    # TODO: factor {namespace}{name} into compound key & eliminate duplicate checking
 }
+
+
+sub _setPersistentHash
+{
+    my ( $this, $name, $value, $params) = @_;
+    
+    my ($store, $namespace)  = $this->_getStoreAndNamespaceFromParams($params);
+
+    # TODO: assert all parameters are set
+    $this->{PersistentVars}{$store}{$namespace}{$name} = $value;
+    $this->debug( "Hash now ". Dumper($this->{PersistentVars})) if $this->{Debug} > 1;
+
+}
+
 
 # =========================
 sub VarSET
 {
     my ( $this, $session, $params, $topic, $web ) = @_;
     my $name  = _sanitizeName( $params->{_DEFAULT} );
+
+    my $value = $params->{value};
+    $this->debug( "SET ($name = $value)".Dumper($params) ) if $this->{Debug};
      
     return '' unless( $name );
-    my $value = $params->{value};
     return '' unless( defined $value );
-    $this->debug( "SET ($name = $value)".Dumper($params) ) if $this->{Debug};
-    my $namespace = $params->{namespace} || '';
-    my $store = $params->{store} || '';
-
+    
     my $remember = $params->{remember} || 0;
     if( $remember && ! ( $remember =~ /^off$/i ) ) {
-        $DB::single = 1;
-        if( (defined $this->{PersistentVars}{$name}) 
-            && ($value eq $this->{PersistentVars}{$name}) ) {
-                $this->debug( "-   eliding (as already set) persistent -> $value" ) if $this->{Debug};
-        } else {
-                $this->_savePersistentVar( $name, $value, $namespace, $store );
-        }
+        $this->_savePersistentVar($name, $value, $params );    
     } else {
         $this->debug( "-   set volatile -> $value" ) if $this->{Debug};
         $this->{VolatileVars}{$name} = $value;
@@ -204,9 +211,6 @@ sub _loadStore
 {
     my ($this, $storeName) = @_;
     #$DB::single = 1;
-    if (! defined $storeName || $storeName eq '') {
-        $storeName = 'default';
-    }    
     $this->debug( "_loadStore ($storeName)" ) if $this->{Debug};   
 
     my $storeFile = $this->_storeFileForStore($storeName);
@@ -217,7 +221,7 @@ sub _loadStore
         my $text = TWiki::Func::readFile( $storeFile );
         $text =~ /^(.*)$/gs; # untaint, it's safe
         $text = $1;
-        $this->{PersistentVars} = eval $text;
+        $this->{PersistentVars}{$storeName} = eval $text;
     }
 }
 
@@ -230,8 +234,6 @@ sub _storeFileForStore {
     my $storeName = $storeNameParam;
     my $file = $this->{StoreFileMapping}{$storeName};
     if (! $file) {
-        $DB::single = 1;
-
         my $behaviour = $this->{UndeclaredStoresBehaviour};
         if ($behaviour eq 'revert') {
             $storeName = 'default';
@@ -251,35 +253,39 @@ Save just the namespace of the variable being saved
 =cut
 sub _savePersistentVar
 {
-    my ( $this, $name, $value, $namespace, $store ) = @_;
-    $store = $store || 'default';
+    my ( $this, $name, $value, $params ) = @_;
+    $DB::single = 1;
     
-    $this->_saveStore($name, $value, $namespace, $store);    
+    $this->_setPersistentHash($name, $value, $params);
+    my ($store, $unusednamespace) = $this->_getStoreAndNamespaceFromParams($params); 
+        
+# TODO: discuss that there was a cache, but that doing two tests on it to save a write into memory is questionable
+#       .... so I disabled it.
+#            if( (defined $this->{PersistentVars}{$name}) 
+#            && ($value eq $this->{PersistentVars}{$name}) ) {
+#                $this->debug( "-   eliding (as already set) persistent -> $value" ) if $this->{Debug};
+#        } else {
+    $this->_saveStore( $name, $value, $store );
+#        }
 }
 
 sub _saveStore
 {
-    my ( $this, $name, $value, $namespace, $store ) = @_;
+    my ( $this, $name, $value, $store) = @_;
     $DB::single = 1;
     $this->debug( "_saveStore ($store)" ) if $this->{Debug};   
     # FIXME: Do atomic transaction to avoid race condition - this will be done with Storable
     
-    
     $this->_loadPersistentVars($store);            # re-load latest from disk in case updated
     my $storeFile = $this->_storeFileForStore($store);
-    
-    if ($namespace) {
-        $this->{PersistentVars}{$namespace}{$name} = $value;
-        $storeFile = $this->_storeFileForStore($store); #check: why needed?
-    } else {
-        $this->{PersistentVars}{$name} = $value; # set variable    
-    }
-    
-    my $text = Data::Dumper->Dump([$this->{PersistentVars}], [qw(PersistentVars)]);
+        
+    my $text = Data::Dumper->Dump([$this->{PersistentVars}{$store}], [qw(PersistentVars)]);
     $this->debug( '--**SAVING ('.$storeFile.') :'."\n".$text) if ($this->{Debug} > 1);
     TWiki::Func::saveFile( $storeFile, $text ) ;
     $this->{StoreTimeStamps}{$store} = ( stat( $storeFile ) )[9];
 }
+
+
 
 # =========================
 sub _sanitizeName
@@ -294,7 +300,7 @@ sub _sanitizeName
 # =========================
 
 
-####### If we need to move to Storable instead of eval. 
+####### TODO: move to Storable instead of eval. 
 
 #use Storable qw(lock_store lock_nstore lock_retrieve);
 

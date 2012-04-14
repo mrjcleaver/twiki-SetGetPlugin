@@ -166,6 +166,8 @@ sub test_set_remember {
     my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
     my $keyname = subname();
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v1", remember=>'1'});
+    $DB::single = 1;
+
     my $actual = $this->do_get($setgetplugin, $keyname);
     
     $this->assert_equals('v1', $actual);
@@ -194,7 +196,6 @@ sub test_default_param_works {
 
     my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
     my $keyname = subname();
-    $DB::single = 1;
 
     my $actual1 = $this->do_get($setgetplugin, { _DEFAULT => $keyname, 'default' => 'default_ans'});
 
@@ -294,7 +295,7 @@ sub test_undeclared_stores_behaviours {
     
     $setgetplugin->{UndeclaredStoresBehaviour} = 'create';
     my $shouldBeNewStore = $setgetplugin->_storeFileForStore('newstore');
-    #$this->assert_matches('.*newstore.dat$', $shouldBeNewStore);
+    $this->assert_matches('.*newstore.dat$', $shouldBeNewStore);
 
     # if UndeclaredStoresBehaviour => 'revert', references to unknown stores will use persistantvars.dat
     $setgetplugin->{UndeclaredStoresBehaviour} = 'revert';
