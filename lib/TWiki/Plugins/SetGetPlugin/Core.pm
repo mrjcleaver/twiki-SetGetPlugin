@@ -22,28 +22,57 @@
 # This is the core module of the SetGetPlugin.
 
 package TWiki::Plugins::SetGetPlugin::Core;
+use Storable qw(lock_store lock_retrieve);
 
 use Data::Dumper;
+use strict;
+
 # =========================
 sub new {
-    my ( $class, $debug ) = @_;
+    my ( $class, $debugParam ) = @_;
 
+    my $debugFlag = 0;
+    if (ref ($debugParam) ne "HASH") {
+        $debugFlag = $debugParam;
+    }  
+    
+    #"persistentvars.dat",
     my $this = {
-          Debug          => $debug,
+          Debug          => $debugFlag,
+          DebugBreakSub       => {
+#            'new' => 1,
+          },
+          DebugTraceSub => {
+#            '_saveStore' => '1',
+#            '_loadStore' => '1',
+#            new => '1',
+             
+          },
           UndeclaredStoresBehaviour => 'create',
           VolatileVars   => undef,
           PersistentVars => undef,
           StoreFileDir  => TWiki::Func::getWorkArea( 'SetGetPlugin' ),
           StoreFileMapping => {
-            "defaultStore" => "persistentvars.dat",
+            "defaultStore" => "default.store",
+            "st1" => "st1.store"
           },
           StoreTimeStamps => {
             "default" => 0,
           }
         };
-    bless( $this, $class );
-    $this->debug( "Core constructor" ) if $this->{Debug};
 
+      
+    
+    bless( $this, $class );
+    $this->debug( "SetGetPlugin::Core constructor" ) if $this->{Debug};
+
+    if (ref ($debugParam) eq "HASH") {
+        foreach my $key (keys %$debugParam) {
+            $this->debug('overriding key '.$key.' (previous value '.$this->{$key}.') with debug set up value='.Dumper($debugParam->{$key}));
+            $this->{$key} = $debugParam->{$key};
+        }
+    }    
+    
     $this->_loadPersistentVars();
 
     return $this;
@@ -52,17 +81,32 @@ sub new {
 sub DESTROY {
     my ($this) = @_;
     if ($this->{Debug}) {
-        $DB::single = 1;
+        $this->debug($this);
         $this->_dumpStores();
-        print "========================================================================\n";
+        print "\n================================================================================================================================================\n";
     }
 }
 
+=pod
+This is an expensive routine. Call only with a conditional that $this->{Debug} is > 0.
+=cut
 sub debug {
     my ($this, $message) = @_;
     $message = $message;
+    my $parentSub = (split( /::/, (caller(1))[3]))[-1]; # last part of the fully qualified package name
+
     TWiki::Func::writeDebug(' - SetGetPlugin '.$message);
-    print STDOUT "\t\t".$message."\n" if ($this->{Debug} > 1);
+    if ($this->{DebugTraceSub}{$parentSub} || $this->{Debug} > 2) {
+        my $callerIndent = " " x _callerDepth();
+        print STDOUT "\t".$callerIndent." ".$parentSub." ".$message."\n"
+    }
+    $DB::single = 1 if ($this->{DebugBreakSub}{$parentSub});
+}
+
+sub _callerDepth {
+    my $depth = 0;
+    for (; caller $depth; $depth++) {1} ; # http://www.perlmonks.org/?node_id=602360 (use sparingly - inefficient)
+    return $depth;
 }
 
 sub _dumpStores {
@@ -70,8 +114,11 @@ sub _dumpStores {
     foreach my $store (keys %{$this->{StoreFileMapping}}) {
         my $storeFile = $this->_storeFileForStore($store);
         if (-e $storeFile) {
-            print "== STOREFILE $store @ $storeFile==\n";
+            print"== STOREFILE $store @ $storeFile==\n";
             system("cat ".$storeFile);
+            print "\n";
+        } else {
+            print "== STOREFILE $store @ $storeFile does not exist==\n";
         }
     }
 }
@@ -95,7 +142,6 @@ sub VarDUMP
     $format = $params->{format} if( defined $params->{format} );
     $sep = $params->{separator} if( defined $params->{separator} );
 
-#    $DB::single = 1;
     $sep =~ s/\$n/\n/g;
     while( my ($k, $v) = each %{$this->{PersistentVars}{$store}{$namespace}} ) {
         $hold = $format;
@@ -194,7 +240,6 @@ sub VarSET
 sub _loadPersistentVars
 {
     my ( $this, $storeArg) = @_;
-   #$DB::single = 1;
     
     if (! defined $storeArg){
         foreach my $store (keys %{$this->{StoreFileMapping}}) {
@@ -210,20 +255,63 @@ sub _loadPersistentVars
 sub _loadStore
 {
     my ($this, $storeName) = @_;
-    #$DB::single = 1;
-    $this->debug( "_loadStore ($storeName)" ) if $this->{Debug};   
+    $this->debug( "($storeName)" ) if $this->{Debug};   
 
     my $storeFile = $this->_storeFileForStore($storeName);
     # check if store is newer, load persistent vars if needed
     my $timeStamp = ( stat( $storeFile ) )[9];
-    if( defined $timeStamp && $timeStamp != $this->{StoreTimeStamps}{$storeName} ) {
-        $this->{StoreTimeStamps}{$storeName} = $timeStamp;
-        my $text = TWiki::Func::readFile( $storeFile );
-        $text =~ /^(.*)$/gs; # untaint, it's safe
-        $text = $1;
-        $this->{PersistentVars}{$storeName} = eval $text;
+    $this->debug( "timestamp = ".Dumper($timeStamp) ) if $this->{Debug};
+    if( defined $timeStamp && defined $this->{StoreTimeStamps}{$storeName}) {
+        if ($timeStamp != $this->{StoreTimeStamps}{$storeName} ) {
+            $this->{StoreTimeStamps}{$storeName} = $timeStamp;
+            if ($storeFile =~ m/.*\.dat$/) { # TODO: factor out the IF test.
+                $this->{PersistentVars}{$storeName} = $this->_loadPersistentVarsTWikiReadFile($storeFile);    
+            } else {
+                $this->{PersistentVars}{$storeName} = $this->_loadPersistentVarsStorableLock($storeFile);
+            }
+        } else {
+           $this->debug( "timestamp for ".$storeFile." matched existing record");
+        }       
+    } else {
+        $this->debug( "Didn't exist: (No timestamp for) ".$storeFile." ".Dumper(stat $storeFile));
     }
 }
+
+sub _loadPersistentVarsTWikiReadFile {
+    my ($this, $storeFile) = @_;
+    $this->debug( "($storeFile)" ) if $this->{Debug};   
+
+    my $text = TWiki::Func::readFile( $storeFile );
+    $text =~ /^(.*)$/gs; # untaint, it's safe
+    $text = $1;
+    return $text
+};
+
+sub _savePersistentVarsTWikiReadFile
+{
+    my ($this, $storeFile, $ref) = @_;   
+    $this->debug( "($storeFile)" ) if $this->{Debug};    
+    my $text = Data::Dumper->Dump([$ref], [qw(PersistentVars)]);
+    return TWiki::Func::saveFile( $storeFile, $text ) ;
+}
+
+
+sub _loadPersistentVarsStorableLock
+{
+    my ($this, $tempStoreFile) = @_;
+    
+    my $hashref = lock_retrieve($tempStoreFile);    
+    return $hashref;
+}
+
+sub _savePersistentVarsStorableLock
+{
+    my ($this, $storeFile, $ref) = @_;   
+    $this->debug( "($storeFile)" ) if $this->{Debug};      
+    return lock_store($ref, $storeFile); # save
+
+}
+
 
 =pod
 
@@ -242,9 +330,11 @@ sub _storeFileForStore {
         }
         $file = $this->{StoreFileMapping}{$storeName};
     }
-    $this->debug( "_storeFileForStore ($storeNameParam) actually using store ($storeName) in $file" ) if $this->{Debug};   
+    $this->debug( "($storeNameParam) actually using store ($storeName) in $file" ) if $this->{Debug};
+    my $result = $this->{StoreFileDir}.'/'.$file;
 
-    return $this->{StoreFileDir}.'/'.$file;
+    $this->debug( $result ) if $this->{Debug} > 1;   
+    return $result;
 }
 
 
@@ -254,7 +344,7 @@ Save just the namespace of the variable being saved
 sub _savePersistentVar
 {
     my ( $this, $name, $value, $params ) = @_;
-    $DB::single = 1;
+#    $DB::single = 1;
     
     $this->_setPersistentHash($name, $value, $params);
     my ($store, $unusednamespace) = $this->_getStoreAndNamespaceFromParams($params); 
@@ -272,16 +362,21 @@ sub _savePersistentVar
 sub _saveStore
 {
     my ( $this, $name, $value, $store) = @_;
-    $DB::single = 1;
-    $this->debug( "_saveStore ($store)" ) if $this->{Debug};   
+    $this->debug( "($store)" ) if $this->{Debug};   
     # FIXME: Do atomic transaction to avoid race condition - this will be done with Storable
     
     $this->_loadPersistentVars($store);            # re-load latest from disk in case updated
-    my $storeFile = $this->_storeFileForStore($store);
-        
-    my $text = Data::Dumper->Dump([$this->{PersistentVars}{$store}], [qw(PersistentVars)]);
-    $this->debug( '--**SAVING ('.$storeFile.') :'."\n".$text) if ($this->{Debug} > 1);
-    TWiki::Func::saveFile( $storeFile, $text ) ;
+    my $storeFile = $this->_storeFileForStore($store);        
+
+    $this->debug( '--**SAVING ('.$storeFile.') :') if ($this->{Debug} > 1);
+    my $ref = $this->{PersistentVars}{$store};
+    $this->debug(Dumper($ref)) if ($this->{Debug} > 1);    
+    if ($storeFile =~ m/.*\.dat$/) {
+        $this->_savePersistentVarsTWikiReadFile($storeFile, $ref);    
+    } else {
+        $this->_savePersistentVarsStorableLock($storeFile, $ref);    
+    }
+    
     $this->{StoreTimeStamps}{$store} = ( stat( $storeFile ) )[9];
 }
 
@@ -304,7 +399,8 @@ sub _sanitizeName
 
 #use Storable qw(lock_store lock_nstore lock_retrieve);
 
-sub load_into_storable {
+sub loadIntoStorable
+{
     my ($tempStoreFile) = @_;
     
     my $hashref = lock_retrieve($tempStoreFile);    
@@ -312,12 +408,27 @@ sub load_into_storable {
 }
 
 
-sub convert_persistent_vars_to_storeable {
-
+sub convertPersistentVarsToStoreable
+{
     my ($persistentVarsStoreFile) = @_;
-    my $storableStoreFile = $persistentVarsStoreFile.".storable";
-    my $vars = load_persistent_vars($persistentVarsStoreFile);
-    lock_store($vars, $storableStoreFile);
+    my $storableStoreFile = storableForPersistentVarsFile($persistentVarsStoreFile);
+    my $vars = load_persistent_vars($persistentVarsStoreFile); # load
+    lock_store($vars, $storableStoreFile); # save
+    # remove
+}
+
+sub verifyStorableIsEquivalentToPersistentVars
+{
+    my ($persistentVarsStoreFile, $storableStoreFile) = @_;
+    my $storableHash = loadIntoStorable($storableStoreFile);
+#    my $persistentVarsHash = load
+}
+
+sub storableForPersistentVarsFile
+{
+    my ($storableStoreFile) = @_;
+    $storableStoreFile =~ s/\.dat$/.storable/;
+    return $storableStoreFile;
 }
 
 #######

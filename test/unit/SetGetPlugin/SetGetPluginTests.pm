@@ -21,7 +21,20 @@ use Error qw( :try );
 # http://stackoverflow.com/questions/4691448/can-i-insert-break-point-into-source-perl-program
 
 
-my $debug = 2;
+
+my $debug ={ DebugTraceSub => { new => 1,
+                                _saveStore => 1,
+                                _setPersistentHash => 1,
+                                VarGET => 1,
+                                VarSET => 1,
+                                },
+            DebugBreakSub  => {
+                DESTROY => 1,
+            },
+            Debug => 2
+            };
+#$debug = 0;
+
 my $tempStoreFile_not_namespaced = '/tmp/storeFile_not_namespaced';
 my $tempStoreFile_namespaced = '/tmp/storeFile_namespaced';
 
@@ -166,7 +179,6 @@ sub test_set_remember {
     my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
     my $keyname = subname();
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v1", remember=>'1'});
-    $DB::single = 1;
 
     my $actual = $this->do_get($setgetplugin, $keyname);
     
@@ -264,7 +276,7 @@ Tests with a known good store and remember=1
 
 =cut
 
-sub test_set_store_remember_needs_to_be_written {
+sub test_set_store_remember {
     my $this = shift;
     my $keyname = subname();
 
@@ -284,6 +296,36 @@ sub test_set_store_remember_needs_to_be_written {
     $setgetplugin->_dumpStores();
 }
 
+=pod
+Tests that a changed store file results in a reload of the underlying file
+
+If two pages write to the same remembered store value, and write from access B follows write from access A
+should an in-page access from A look back at the store (& get value B) or should it look in the in-memory version?
+
+Answer: it should get its in-memory version
+=cut
+
+sub test_set_store_remember_parallel_access_needs_to_be_written {
+    my $this = shift;
+    my $keyname = subname();
+
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    $DB::single = 1;
+    my $setgetplugin2 = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    $this->do_set($setgetplugin, {_DEFAULT => $keyname, store => "st1", value => "v1", remember => "1"});
+    $this->do_set($setgetplugin2, {_DEFAULT => $keyname, store => "st1", value => "v2", remember => "1"});
+    
+    my $actual1 = $this->do_get($setgetplugin, {_DEFAULT => $keyname, store => "st1"});
+    my $actual2 = $this->do_get($setgetplugin2, {_DEFAULT => $keyname, store => "st1"});
+
+    #$this->assert_equals("key: $keyname, value: v1 <br />\nkey: $keyname, value: v2 <br />\n", $this->do_dump($setgetplugin)); 
+    $this->assert_equals('v1', $actual1);
+    $this->assert_equals('v2', $actual2);
+    
+    $setgetplugin->_dumpStores();
+}
+
+# TODO: I changed the name of the default store, from default to defaultStore
 sub test_undeclared_stores_behaviours {
     my $this = shift;
     my $keyname = subname();
