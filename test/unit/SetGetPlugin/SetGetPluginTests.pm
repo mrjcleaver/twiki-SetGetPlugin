@@ -365,8 +365,18 @@ sub test_client_scenario1 {
     $this->assert_equals("", $actual1_no_store);
     
     my $actual2_no_store = $this->do_get($setgetplugin, {_DEFAULT => $keyname});
-    $this->assert_equals("", $actual2_no_store);    
+    $this->assert_equals("", $actual2_no_store);
     
+    $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "cello1", namespace => "ns1", remember => "1"});
+    my $actual1_ns1 = $this->do_get($setgetplugin, {_DEFAULT => $keyname, namespace => "ns1"});
+    $this->assert_equals("cello1", $actual1_ns1); 
+    
+    $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "cello2", namespace => "ns2", remember => "1"});    
+    my $actual1_ns2 = $this->do_get($setgetplugin, {_DEFAULT => $keyname, namespace => "ns2"});
+    $this->assert_equals("cello2", $actual1_ns2);     
+    
+    my $actual1_unqualified = $this->do_get($setgetplugin, {_DEFAULT => $keyname});
+    $this->assert_equals("", $actual1_unqualified);    
 }
 
 =pod
