@@ -25,6 +25,7 @@ use Error qw( :try );
 my $debug ={ DebugTraceSub => { new => 1,
                                 _saveStore => 1,
                                 _setPersistentHash => 1,
+                                _getPersistentHash => 1,
                                 VarGET => 1,
                                 VarSET => 1,
                                 },
@@ -310,7 +311,6 @@ sub test_set_store_remember_parallel_access_needs_to_be_written {
     my $keyname = subname();
 
     my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
-    $DB::single = 1;
     my $setgetplugin2 = new TWiki::Plugins::SetGetPlugin::Core( $debug );
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, store => "st1", value => "v1", remember => "1"});
     $this->do_set($setgetplugin2, {_DEFAULT => $keyname, store => "st1", value => "v2", remember => "1"});
@@ -344,6 +344,29 @@ sub test_undeclared_stores_behaviours {
     my $shouldBeRevertedToDefault = $setgetplugin->_storeFileForStore('notallowednewstore');
     $this->assert_matches('.*persistentvars.dat$', $shouldBeRevertedToDefault);    
 
+}
+
+sub test_client_scenario1 {
+    my $this = shift;
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $keyname = "dummyvar_001";
+    $setgetplugin->{StoreFileMapping}{newdat} = 'new.dat';
+    $setgetplugin->{StoreFileMapping}{newstore} = 'new.store';
+    
+    $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "cello1", store => "newdat", remember => "1"});
+    my $actual1 = $this->do_get($setgetplugin, {_DEFAULT => $keyname, store => "newdat"});
+    $this->assert_equals("cello1", $actual1); 
+    
+    $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "cello2", store => "newstore", remember => "1"});    
+    my $actual2 = $this->do_get($setgetplugin, {_DEFAULT => $keyname, store => "newstore"});
+    $this->assert_equals("cello2", $actual2); 
+    
+    my $actual1_no_store = $this->do_get($setgetplugin, {_DEFAULT => $keyname});
+    $this->assert_equals("", $actual1_no_store);
+    
+    my $actual2_no_store = $this->do_get($setgetplugin, {_DEFAULT => $keyname});
+    $this->assert_equals("", $actual2_no_store);    
+    
 }
 
 =pod

@@ -30,22 +30,17 @@ use strict;
 # =========================
 sub new {
     my ( $class, $debugParam ) = @_;
-
-    my $debugFlag = 0;
-    if (ref ($debugParam) ne "HASH") {
-        $debugFlag = $debugParam;
-    }  
     
     #"persistentvars.dat",
     my $this = {
-          Debug          => $debugFlag,
           DebugBreakSub       => {
 #            'new' => 1,
           },
           DebugTraceSub => {
-#            '_saveStore' => '1',
-#            '_loadStore' => '1',
-#            new => '1',
+#            '_saveStore' => 1,
+#            '_loadStore' => 1,
+#            new => 1,
+            '_dumpStores' => 1
              
           },
           UndeclaredStoresBehaviour => 'create',
@@ -61,14 +56,20 @@ sub new {
           }
         };
 
-      
+    my $debugFlag = undef;
+    if (ref ($debugParam) ne "HASH") {
+        $debugFlag = $debugParam;
+        if ($debugFlag > 0) { # Do not conflate with undef - this is user set & won't be undef
+            $this->{Debug} = $debugFlag;        
+        }
+    }
     
     bless( $this, $class );
     $this->debug( "SetGetPlugin::Core constructor" ) if $this->{Debug};
 
     if (ref ($debugParam) eq "HASH") {
         foreach my $key (keys %$debugParam) {
-            $this->debug('overriding key '.$key.' (previous value '.$this->{$key}.') with debug set up value='.Dumper($debugParam->{$key}));
+            $this->debug('overriding key '.$key.' (previous value '.$this->{$key}.') with debug set up value='.Dumper($debugParam->{$key})) if $this->{Debug};
             $this->{$key} = $debugParam->{$key};
         }
     }    
@@ -81,7 +82,7 @@ sub new {
 sub DESTROY {
     my ($this) = @_;
     if ($this->{Debug}) {
-        $this->debug($this);
+        $this->debug($this); # already in if $this->{Debug};   
         $this->_dumpStores();
         print "\n================================================================================================================================================\n";
     }
@@ -95,11 +96,16 @@ sub debug {
     $message = $message;
     my $parentSub = (split( /::/, (caller(1))[3]))[-1]; # last part of the fully qualified package name
 
-    TWiki::Func::writeDebug(' - SetGetPlugin '.$message);
-    if ($this->{DebugTraceSub}{$parentSub} || $this->{Debug} > 2) {
-        my $callerIndent = " " x _callerDepth();
-        print STDOUT "\t".$callerIndent." ".$parentSub." ".$message."\n"
+    if ($this->{Debug}) {
+                
+        TWiki::Func::writeDebug(' - SetGetPlugin '.$message) if ($this->{Debug} == 1);
+        if ($this->{DebugTraceSub}{$parentSub} || $this->{Debug} > 2) {        
+            my $callerIndent = " " x _callerDepth();
+            print STDOUT "\t".$callerIndent." ".$parentSub." ".$message."\n";
+            TWiki::Func::writeDebug(' - SetGetPlugin '.$callerIndent." ".$parentSub." ".$message);
+        }
     }
+
     $DB::single = 1 if ($this->{DebugBreakSub}{$parentSub});
 }
 
@@ -111,6 +117,8 @@ sub _callerDepth {
 
 sub _dumpStores {
     my ($this) = @_;
+    $DB::single = 1;
+    $this->debug("Dump:") if $this->{Debug};
     foreach my $store (keys %{$this->{StoreFileMapping}}) {
         my $storeFile = $this->_storeFileForStore($store);
         if (-e $storeFile) {
@@ -191,6 +199,7 @@ sub _getPersistentHash
     my ($this, $name, $params) = @_;
     my ($store, $namespace)  = $this->_getStoreAndNamespaceFromParams($params);    
 
+    $this->debug( "Hash for get ($store, $namespace) ". Dumper($this->{PersistentVars})) if $this->{Debug} > 1;
     my $value = '';    
     $value = $this->{PersistentVars}{$store}{$namespace}{$name}
         if ( defined $this->{PersistentVars}{$store}{$namespace}{$name} ) ;
@@ -270,10 +279,10 @@ sub _loadStore
                 $this->{PersistentVars}{$storeName} = $this->_loadPersistentVarsStorableLock($storeFile);
             }
         } else {
-           $this->debug( "timestamp for ".$storeFile." matched existing record");
+           $this->debug( "timestamp for ".$storeFile." matched existing record") if $this->{Debug};   
         }       
     } else {
-        $this->debug( "Didn't exist: (No timestamp for) ".$storeFile." ".Dumper(stat $storeFile));
+        $this->debug( "Didn't exist: (No timestamp for) ".$storeFile." ".Dumper(stat $storeFile)) if $this->{Debug};   
     }
 }
 
@@ -397,16 +406,6 @@ sub _sanitizeName
 
 ####### TODO: move to Storable instead of eval. 
 
-#use Storable qw(lock_store lock_nstore lock_retrieve);
-
-sub loadIntoStorable
-{
-    my ($tempStoreFile) = @_;
-    
-    my $hashref = lock_retrieve($tempStoreFile);    
-    return $hashref;
-}
-
 
 sub convertPersistentVarsToStoreable
 {
@@ -424,12 +423,6 @@ sub verifyStorableIsEquivalentToPersistentVars
 #    my $persistentVarsHash = load
 }
 
-sub storableForPersistentVarsFile
-{
-    my ($storableStoreFile) = @_;
-    $storableStoreFile =~ s/\.dat$/.storable/;
-    return $storableStoreFile;
-}
 
 #######
 1;
