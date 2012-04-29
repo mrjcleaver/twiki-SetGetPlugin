@@ -28,31 +28,32 @@ use Data::Dumper;
 use strict;
 
 # =========================
+
+## TODO: clean up unnecessary double quotes into single quotes
 sub new {
     my ( $class, $debugParam ) = @_;
     
-    #"persistentvars.dat",
     my $this = {
           DebugBreakSub       => {
 #            'new' => 1,
           },
           DebugTraceSub => {
-#            '_saveStore' => 1,
-#            '_loadStore' => 1,
-#            new => 1,
-            '_dumpStores' => 1
-             
+            new => 1,
           },
-          UndeclaredStoresBehaviour => 'create',
+          UndeclaredStoresBehaviour => 'createUnknown',
           VolatileVars   => undef,
           PersistentVars => undef,
           StoreFileDir  => TWiki::Func::getWorkArea( 'SetGetPlugin' ),
           StoreFileMapping => {
-            "defaultStore" => "default.store",
-            "st1" => "st1.store"
+            "defaultStore" => "persistentvars.dat",
+          },
+          DefaultStoreType => 'Legacy',
+          StoreExtension => {
+            "Storable" => ".store",
+            "Legacy" => ".dat",
           },
           StoreTimeStamps => {
-            "default" => 0,
+            "defaultStore" => 0,
           }
         };
 
@@ -74,11 +75,59 @@ sub new {
         }
     }    
     
+    $this->_loadConfigSpec(); # if $TWiki::cfg{SetGetPlugin};
+    
     $this->_loadPersistentVars();
 
     return $this;
 }
 
+=pod
+Loads and validates all CFG environmental data.
+=cut
+sub _loadConfigSpec {
+    my ($this) = @_;
+    $this->debug('');
+    
+    my @storesList =  map {   
+                s/^\s+//;  # strip leading spaces
+                s/\s+$//;  # strip trailing spaces
+                $_         # return the modified string
+            }
+            split ',', $TWiki::cfg{SetGetPlugin}{OtherStores} || '';
+
+    
+    $this->{DefaultStoreType} = $TWiki::cfg{SetGetPlugin}{DefaultStoreType} || $this->{DefaultStoreType};
+    
+    foreach my $store (@storesList) { # what the admin gave us
+        my ($storeName, $storeFile) = $this->_defaultStoreFileForStoreName($store);
+        $this->{StoreFileMapping}{$storeName} = $storeFile;
+    }
+    
+    # TODO: DRY this is ugly code. Possibly https://metacpan.org/module/Deep::Hash::Utils if acceptable as a dependency
+    if ($TWiki::cfg{SetGetPlugin}{StoreExtension}{Legacy}) {
+        $this->{StoreExtension}{Legacy} = $TWiki::cfg{SetGetPlugin}{StoreExtension}{Legacy};
+    }
+    if ($TWiki::cfg{SetGetPlugin}{StoreExtension}{Storable}) {
+        $this->{StoreExtension}{Storable} = $TWiki::cfg{SetGetPlugin}{StoreExtension}{Storable};
+    }
+}
+
+sub _defaultStoreFileForStoreName {
+        my ($this, $store) = @_;
+        
+        my $defaultExtension = $this->{StoreExtension}{$this->{DefaultStoreType}};
+        my ($storeFile, $storeName);
+        if ($store =~ m/(.*)\.(.*)/) { # is a storeFile
+            $storeFile = $store;
+            $storeName = $1;
+        } else { # is a storeName
+            $storeName = $store;
+            $storeFile = $store . $defaultExtension;            
+        }
+    return ($storeName, $storeFile);
+}
+        
 sub DESTROY {
     my ($this) = @_;
     if ($this->{Debug}) {
@@ -117,7 +166,6 @@ sub _callerDepth {
 
 sub _dumpStores {
     my ($this) = @_;
-    $DB::single = 1;
     $this->debug("Dump:") if $this->{Debug};
     foreach my $store (keys %{$this->{StoreFileMapping}}) {
         my $storeFile = $this->_storeFileForStore($store);
@@ -131,6 +179,14 @@ sub _dumpStores {
     }
 }
 
+=pod
+Returns 0 or 1 whether there is a file for a given store name
+=cut
+sub _storeFileExists {
+    my ($this, $store) = @_;
+    my $storeFile = $this->_storeFileForStore($store);
+    return -e $storeFile || 0;
+}
 
 # =========================
 sub VarDUMP
@@ -270,20 +326,28 @@ sub _loadStore
     # check if store is newer, load persistent vars if needed
     my $timeStamp = ( stat( $storeFile ) )[9];
     $this->debug( "timestamp = ".Dumper($timeStamp) ) if $this->{Debug};
-    if( defined $timeStamp && defined $this->{StoreTimeStamps}{$storeName}) {
-        if ($timeStamp != $this->{StoreTimeStamps}{$storeName} ) {
-            $this->{StoreTimeStamps}{$storeName} = $timeStamp;
-            if ($storeFile =~ m/.*\.dat$/) { # TODO: factor out the IF test.
-                $this->{PersistentVars}{$storeName} = $this->_loadPersistentVarsTWikiReadFile($storeFile);    
-            } else {
-                $this->{PersistentVars}{$storeName} = $this->_loadPersistentVarsStorableLock($storeFile);
-            }
-        } else {
-           $this->debug( "timestamp for ".$storeFile." matched existing record") if $this->{Debug};   
-        }       
-    } else {
-        $this->debug( "Didn't exist: (No timestamp for) ".$storeFile." ".Dumper(stat $storeFile)) if $this->{Debug};   
+    if( ! defined $timeStamp ) {
+        $this->debug( "File doesn't exist: ".$storeFile." (SO ABORTING LOAD)".Dumper(stat $storeFile)) if $this->{Debug} > 1;
+        return;
     }
+
+    if (! defined $this->{StoreTimeStamps}{$storeName}) {
+        $this->debug( "No recorded timestamp for ".$storeName." (SO CONTINUING LOAD)") if $this->{Debug} > 1;       
+    } elsif ($timeStamp == $this->{StoreTimeStamps}{$storeName} ) {
+        $this->debug( "timestamp for ".$storeFile." matched existing record (SO ABORTING LOAD)") if $this->{Debug} > 1;
+        return;
+    } # else it didn't match, continue.
+
+    $this->debug( "File ".$storeFile." is newer than records (PERFORMING LOAD)") if $this->{Debug} > 1;    
+    # So, now the store is newer than our record of it. So our records have been invalided. Load it.
+    $this->{StoreTimeStamps}{$storeName} = $timeStamp;
+    my $legacyExt = quotemeta($this->{StoreExtension}{Legacy});
+    if ($storeFile =~ m/.*$legacyExt$/) { # TODO: factor out the IF test.
+        $this->{PersistentVars}{$storeName} = $this->_loadPersistentVarsTWikiReadFile($storeFile);    
+    } else {
+        $this->{PersistentVars}{$storeName} = $this->_loadPersistentVarsStorableLock($storeFile);
+    }
+    $this->debug( "Loaded". Dumper($this->{PersistentVars}{$storeName})) if $this->{Debug} > 1;
 }
 
 sub _loadPersistentVarsTWikiReadFile {
@@ -291,9 +355,11 @@ sub _loadPersistentVarsTWikiReadFile {
     $this->debug( "($storeFile)" ) if $this->{Debug};   
 
     my $text = TWiki::Func::readFile( $storeFile );
-    $text =~ /^(.*)$/gs; # untaint, it's safe
+    $text =~ /^(.*)$/gs; # untaint, it's safe because an internal file
     $text = $1;
-    return $text
+    use vars qw($PersistentVars);
+    my $hashref = eval $text; # sets variable $PersistentVars, with side effect to return value to end up in $hashref
+    return $hashref;
 };
 
 sub _savePersistentVarsTWikiReadFile
@@ -307,9 +373,10 @@ sub _savePersistentVarsTWikiReadFile
 
 sub _loadPersistentVarsStorableLock
 {
-    my ($this, $tempStoreFile) = @_;
+    my ($this, $storeFile) = @_;
+    $this->debug( "($storeFile)" ) if $this->{Debug};   
     
-    my $hashref = lock_retrieve($tempStoreFile);    
+    my $hashref = lock_retrieve($storeFile);    
     return $hashref;
 }
 
@@ -321,6 +388,27 @@ sub _savePersistentVarsStorableLock
 
 }
 
+=pod
+Migrate existing persistentVars as a storable lock implementation
+=cut
+sub _convertPersistentVarsIntoStorableLock {
+    my ($this, $persistentVarsFile, $storableLockFile) = @_;
+    $this->debug("($persistentVarsFile, $storableLockFile)");
+    $this->{PersistentVars}{LastConverted} = $this->_loadPersistentVarsTWikiReadFile($persistentVarsFile);
+    $this->_savePersistentVarsStorableLock($storableLockFile, $this->{PersistentVars}{LastConverted});
+}
+
+=pod
+Migrate existing storable lock as a persistentVars implementation
+=cut
+sub _convertStorableLockIntoPersistentVars {
+    my ($this, $storableLockFile, $persistentVarsFile) = @_;
+    $this->debug("($storableLockFile, $persistentVarsFile)");
+    $this->{PersistentVars}{LastConverted} = $this->_loadPersistentVarsStorableLock($storableLockFile);
+    $this->_savePersistentVarsTWikiReadFile($persistentVarsFile, $this->{PersistentVars}{LastConverted});
+}
+
+
 
 =pod
 
@@ -329,18 +417,26 @@ sub _storeFileForStore {
     my ($this, $storeNameParam) = @_;
 
     my $storeName = $storeNameParam;
-    my $file = $this->{StoreFileMapping}{$storeName};
-    if (! $file) {
+    my $storeFile = $this->{StoreFileMapping}{$storeName};
+    if (! $storeFile) {
         my $behaviour = $this->{UndeclaredStoresBehaviour};
-        if ($behaviour eq 'revert') {
-            $storeName = 'default';
-        } elsif ($behaviour eq 'create') {
-            $this->{StoreFileMapping}{$storeName} = $storeName.'.dat';
+        if ($behaviour eq 'revertToDefault') {
+            # change the store name to use the default store
+            $storeName = 'defaultStore';
+        } elsif ($behaviour eq 'createUnknown') {
+            # accept the store name as is, and map the storeName
+            ($storeName, $storeFile) = $this->_defaultStoreFileForStoreName($storeNameParam);
+            $this->{StoreFileMapping}{$storeName} = $storeFile;
+        } else {
+            # invalid behaviour type
+            TWiki::Func::writeWarning("Invalid UndeclaredStoresBehaviour ".$behaviour. " for ".$storeName);
+            $storeName = 'defaultStore';            
         }
-        $file = $this->{StoreFileMapping}{$storeName};
+        $storeFile = $this->{StoreFileMapping}{$storeName};
+        # TODO: write error or warning if $file is an invalid name
     }
-    $this->debug( "($storeNameParam) actually using store ($storeName) in $file" ) if $this->{Debug};
-    my $result = $this->{StoreFileDir}.'/'.$file;
+    $this->debug( "($storeNameParam) actually using store ($storeName) in $storeFile" ) if $this->{Debug};
+    my $result = $this->{StoreFileDir}.'/'.$storeFile;
 
     $this->debug( $result ) if $this->{Debug} > 1;   
     return $result;
@@ -353,7 +449,6 @@ Save just the namespace of the variable being saved
 sub _savePersistentVar
 {
     my ( $this, $name, $value, $params ) = @_;
-#    $DB::single = 1;
     
     $this->_setPersistentHash($name, $value, $params);
     my ($store, $unusednamespace) = $this->_getStoreAndNamespaceFromParams($params); 
@@ -379,8 +474,9 @@ sub _saveStore
 
     $this->debug( '--**SAVING ('.$storeFile.') :') if ($this->{Debug} > 1);
     my $ref = $this->{PersistentVars}{$store};
-    $this->debug(Dumper($ref)) if ($this->{Debug} > 1);    
-    if ($storeFile =~ m/.*\.dat$/) {
+    $this->debug('HASH to save: '.Dumper($ref)) if ($this->{Debug} > 1);
+    my $legacyExt = quotemeta($this->{StoreExtension}{Legacy});
+    if ($storeFile =~ m/.*$legacyExt$/) {
         $this->_savePersistentVarsTWikiReadFile($storeFile, $ref);    
     } else {
         $this->_savePersistentVarsStorableLock($storeFile, $ref);    
@@ -402,9 +498,6 @@ sub _sanitizeName
 }
 
 # =========================
-
-
-####### TODO: move to Storable instead of eval. 
 
 
 sub convertPersistentVarsToStoreable
