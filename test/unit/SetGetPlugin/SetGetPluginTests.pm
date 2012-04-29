@@ -35,7 +35,7 @@ sub list_tests {
     my @tests = $this->SUPER::list_tests($suite);
     if ($ENV{SGPTESTNAME} && $ENV{SGPTESTNAME} ne 'all') {
         @tests = ('SetGetPluginTests::'.$ENV{SGPTESTNAME});
-     #   $debug->{Debug} = '2';
+        $this->{DebuggedSettings}->{Debug} = '2';
     }
     return @tests;
 }
@@ -47,8 +47,8 @@ sub narrate {
 }
 
 sub narrateDebug {
-    my ($this, $debug) = @_;
-    $this->narrate("Tracing ".join(', ', sort keys(%{$debug->{DebugTraceSub}}))) if $this->{Debug};
+    my ($this) = @_;
+    $this->narrate("Tracing ".join(', ', sort keys(%{$this->{DebuggedSettings}->{DebugTraceSub}}))) if $this->{Debug};
 }
     
 
@@ -59,24 +59,6 @@ sub annotate {
     $this->narrate($message);
 }
 
-our $debug = {
-                DebugTraceSub => { new => 1,
-                                _saveStore => 1,
-                                _setPersistentHash => 1,
-                                _getPersistentHash => 1,
-                                VarGET => 1,
-                                VarSET => 1,
-                                },
-                DebugBreakSub  => {
-                    DESTROY => 1,
-                },
-                Debug => 2
-            };
-$debug->{Debug} = '0';
-# In a particular test, once initialized, you can trace or break a sub like this:
-#    $debug->{DebugTraceSub}->{'_loadConfigSpec'} = '1';
-#    $debug->{DebugBreakSub}->{'_loadConfigSpec'} = '1';
-# This will emit/break on the first call to $this->debug()
 
 
 my $tempStoreFile_not_namespaced = '/tmp/storeFile_not_namespaced';
@@ -86,6 +68,24 @@ my $tempStoreFile_namespaced = '/tmp/storeFile_namespaced';
 sub set_up {
     my $this = shift;
 
+    $this->{DebuggedSettings} = {
+                    DebugTraceSub => { 
+                                    VarGET => 1,
+                                    VarSET => 1,
+                                    },
+                    DebugBreakSub  => {
+                        DESTROY => 1,
+                    },
+                    Debug => 1
+                };
+    $this->{DebuggedSettings}->{Debug} = '1';
+
+# In a particular test, once initialized, you can trace or break a sub like this:
+#    $this->{DebuggedSettings}->{DebugTraceSub}->{'_loadConfigSpec'} = '1';
+#    $this->{DebuggedSettings}->{DebugBreakSub}->{'_loadConfigSpec'} = '1';
+# This will emit/break on the first call to $this->{DebuggedSettings}()
+    
+    
     $this->SUPER::set_up();
     
     $DB::single = 1;
@@ -99,8 +99,8 @@ sub set_up {
     $this->{twiki}->{store}->createWeb(
         $this->{twiki}->{user}, $this->{target_web2}
     );
-    set_up_save_persistent_vars_not_namespaced();
-    set_up_save_persistent_vars_namespaced();
+    #set_up_save_persistent_vars_not_namespaced();
+    #set_up_save_persistent_vars_namespaced();
 }
 
 
@@ -208,7 +208,7 @@ sub subname {
 sub test_set_volatile {
     my $this = shift;
     
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     my $keyname = subname();
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v1"});
     my $actual = $this->do_get($setgetplugin,$keyname);
@@ -223,7 +223,7 @@ sub test_set_volatile {
 sub test_set_remember {
     my $this = shift;
 
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     my $keyname = subname();
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v1", remember=>'1'});
 
@@ -237,7 +237,7 @@ sub test_set_remember {
 sub test_set_doesnt_care_about_web {
     my $this = shift;
 
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     my $keyname = subname();
 
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v1", remember=>'1'});
@@ -253,7 +253,7 @@ sub test_set_doesnt_care_about_web {
 sub test_default_param_works {
     my $this = shift;
 
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     my $keyname = subname();
 
     my $actual1 = $this->do_get($setgetplugin, { _DEFAULT => $keyname, 'default' => 'default_ans'});
@@ -266,7 +266,7 @@ sub test_set_namespace_volatile_should_be_ignored {
     
     my $keyname = subname();
     
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v1", namespace => "ns1"});
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v2", namespace => "ns2"});
     
@@ -287,7 +287,7 @@ sub test_set_namespace_remember {
     my $this = shift;
     my $keyname = subname();
     
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v0", remember=>"1"});    # not namespaced
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v1", namespace => "ns1", remember=>"1"});
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v2", namespace => "ns2", remember=>"1"});
@@ -307,7 +307,7 @@ sub test_set_store_not_remembered_does_not_need_to_work {
     my $this = shift;
     my $keyname = subname();
     
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v1", store => "store1"});
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v2", store => "store2"});
     
@@ -327,7 +327,7 @@ sub test_set_store_remember {
     my $this = shift;
     my $keyname = subname();
 
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     $setgetplugin->{UndeclaredStoresBehaviour} = 'createUnknown';
     
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, store => "st1", value => "v1", remember => "1"});
@@ -349,18 +349,18 @@ sub test_set_store_remember_parallel_access {
     my $keyname = subname();
     
     $this->annotate("Tests that a changed store file results in a reload of the underlying file");
-    $debug->{DebugTraceSub}->{'_loadConfigSpec'} = '1';
-    $debug->{DebugTraceSub}->{'_loadStore'} = '1';
-    $debug->{DebugTraceSub}->{'_getPersistentHash'} = '1';
-    $debug->{DebugTraceSub}->{'_setPersistentHash'} = '1';
-    $debug->{DebugTraceSub}->{'_loadPersistentVarsTWikiReadFile'} = '1';
-    $debug->{DebugTraceSub}->{'_loadPersistentVarsStorableLock'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_loadConfigSpec'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_loadStore'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_getPersistentHash'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_setPersistentHash'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_loadPersistentVarsTWikiReadFile'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_loadPersistentVarsStorableLock'} = '1';
     
     my $storeType = 'Storable';
-    $this->narrateDebug($debug);
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    $this->narrateDebug();
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     $setgetplugin->{DefaultStoreType} = $storeType;
-    my $setgetplugin2 = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin2 = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     $setgetplugin2->{DefaultStoreType} = $storeType;
     
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, store => "st1", value => "v1", remember => "1"});
@@ -379,7 +379,7 @@ should an in-page access from A look back at the store (& get value B) or should
 
     $this->narrate("However, if one page writes to a remembered store value, and another page looks up that value and does not have an
 in-memory value then it should not find a value as it is using a volatile setting");
-    my $setgetplugin3 = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin3 = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     my $actual3 = $this->do_get($setgetplugin3, {_DEFAULT => $keyname, store => "st1"});
     $this->annotate("Access from a page that doesn't have a local value, so should find nothing ".$actual3);
     $this->assert_equals('', $actual3);
@@ -392,7 +392,7 @@ sub test_undeclared_stores_behaviours {
     my $this = shift;
     my $keyname = subname();
     
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     my $shouldBeDefault = $setgetplugin->_storeFileForStore('default');
     $this->assert_matches('.*persistentvars.dat$', $shouldBeDefault);
     
@@ -410,7 +410,7 @@ sub test_persistentVarsIsDefault {
     my $this = shift;
     my $keyname = subname();
     
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     
     $this->assert_matches('.*persistentvars.dat$', $setgetplugin->{StoreFileMapping}{defaultStore});    
 }
@@ -419,9 +419,9 @@ sub test_loadConfigSpecDefaultConfig {
     my $this = shift;
     my $keyname = subname();
     
-    $debug->{DebugTraceSub}->{'_loadConfigSpec'} = '1';
-    $debug->{DebugBreakSub}->{'_loadConfigSpec'} = '1';
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );    
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_loadConfigSpec'} = '1';
+    $this->{DebuggedSettings}->{DebugBreakSub}->{'_loadConfigSpec'} = '1';
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );    
     $this->assert_equals("persistentvars.dat", $setgetplugin->{StoreFileMapping}{defaultStore});
     $this->assert_equals("Legacy", $setgetplugin->{DefaultStoreType});
     $this->assert_equals(".dat", $setgetplugin->{StoreExtension}{Legacy});
@@ -435,8 +435,8 @@ sub test_loadConfigSpecExtraStores {
     
     $TWiki::cfg{SetGetPlugin}{OtherStores} = 'noExtension, storeExtension.store, datExtension.dat';
 
-    $debug->{DebugBreakSub}->{'_loadConfigSpec'} = '1';
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );    
+    $this->{DebuggedSettings}->{DebugBreakSub}->{'_loadConfigSpec'} = '1';
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );    
     $this->assert_equals("Legacy", $setgetplugin->{DefaultStoreType});
     $this->assert_equals("noExtension.dat", $setgetplugin->{StoreFileMapping}{noExtension});
     $this->assert_equals("storeExtension.store", $setgetplugin->{StoreFileMapping}{storeExtension});
@@ -448,11 +448,20 @@ sub test_loadImportsLegacyNonNamespacedPersistentVars {
     my $keyname = subname();
     
     $this->narrate("Previous releases of SetGetPlugin did not use namespaces. So we need to make sure those get put into the defaultNamespace");
-    $debug->{DebugBreakSub}->{'_loadConfigSpec'} = '1';
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    $this->{DebuggedSettings}->{DebugBreakSub}->{'_loadConfigSpec'} = '1';
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     
     my $defaultStoreFile = $setgetplugin->_storeFileForStore('defaultStore');
     $this->assert_not_null($defaultStoreFile);
+    
+    my $legacyFormat =<<"EOM";
+\$PersistentVars = {
+                    'defaultNamespace' => {
+                                            '$keyname' => 'cello'
+                                          }
+                  };
+EOM
+    
 }
 
 
@@ -461,22 +470,22 @@ sub test_saveStoresSavesInRightFormatsAndConvertsBetweenFormats {
     my $keyname = subname();
     
     $TWiki::cfg{SetGetPlugin}{OtherStores} = 'store1.store, dat1.dat';
-    $debug->{Debug} = '0';
-    $debug->{DebugTraceSub}->{'_savePersistentVarsTWikiReadFile'} = '1';
-    $debug->{DebugTraceSub}->{'_savePersistentVarsStorableLock'} = '1';
-    $debug->{DebugTraceSub}->{'_loadConfigSpec'} = '1';
-    $debug->{DebugTraceSub}->{'_convertPersistentVarsIntoStorableLock'} = '1';
-    $debug->{DebugTraceSub}->{'_convertStorableLockIntoPersistentVars'} = '1';
-    $debug->{DebugTraceSub}->{'_loadStore'} = '1';
-    $debug->{DebugTraceSub}->{'_saveStore'} = '1';
-    $debug->{DebugTraceSub}->{'_storeFileForStore'} = '1';
-    $debug->{DebugBreakSub}->{'_convertStorableLockIntoPersistentVars'} = '1';
+    $this->{DebuggedSettings}->{Debug} = '0';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_savePersistentVarsTWikiReadFile'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_savePersistentVarsStorableLock'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_loadConfigSpec'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_convertPersistentVarsIntoStorableLock'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_convertStorableLockIntoPersistentVars'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_loadStore'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_saveStore'} = '1';
+    $this->{DebuggedSettings}->{DebugTraceSub}->{'_storeFileForStore'} = '1';
+    $this->{DebuggedSettings}->{DebugBreakSub}->{'_convertStorableLockIntoPersistentVars'} = '1';
     
-    $this->narrateDebug($debug);
+    $this->narrateDebug();
     $TWiki::cfg{SetGetPlugin}{StoreExtension}{Legacy} = '.dat';
     $TWiki::cfg{SetGetPlugin}{StoreExtension}{Storable} = '.store';
     
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
 
     $this->narrate("Set a variable into defaultStore");
 
@@ -522,7 +531,7 @@ EOM
 
 sub test_client_scenario1 {
     my $this = shift;
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     my $keyname = "dummyvar_001";
     $setgetplugin->{StoreFileMapping}{newdat} = 'new.dat';
     $setgetplugin->{StoreFileMapping}{newstore} = 'new.store';
@@ -563,7 +572,7 @@ sub disabled_test_set_store_remember_bad_store_needs_to_be_written {
     
     $TWiki::cfg{SetGetPlugin}{stores} = 'storeA, storeB';
     
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     $this->do_set($setgetplugin, {_DEFAULT => $keyname, value => "v1", store => "nonExistantStore", remember => "1"});
     
     my $actual = $this->do_get($setgetplugin, {_DEFAULT => $keyname, store=> "st1"});
@@ -588,7 +597,7 @@ sub load_persistent_vars {
 
 sub junk_test_load_persistent_vars {
     my $this = shift;
-    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
 
     my $PersistentVars = load_persistent_vars($tempStoreFile_not_namespaced);
     print Data::Dumper->Dump([$PersistentVars], [qw(PersistentVars)]);
