@@ -1,0 +1,12 @@
+%META:TOPICINFO{author="TWikiContributor" date="1325883668" format="1.1" version="$Rev$"}%
+%META:TOPICPARENT{name="TWikiVariables"}%
+#VarSETGETDUMPALL
+---+++ SETGETDUMPALL{...} -- dump persistent variables
+   * Dump _persistent_ key/values previously set with =%<nop>SET{}%=.  %IF{"'%INCLUDINGTOPIC%'!='SetGetPlugin'" then="The =%<nop>SETGETDUMPALL{}<nop>%=, =%<nop>SET{}<nop>%=, and =%<nop>GET{}<nop>%= variables are handled by the SetGetPlugin." }%
+   * Syntax: =%<nop>SETGETDUMPALL{ format="..." separator="..." }%=
+   * Supported attributes:
+     | *Attribute* | *Comment* | *Default* |
+     | =format="..."= | Format output using variables =$<nop>store=, =$<nop>namespace=, =$<nop>key= and =$<nop>value= | ="store: $<nop>store, namespace: $<nop>namespace, key: $<nop>key, value: $<nop>value &lt;br /&gt;"= |
+     | =separator="..."= | String used for separating entries | ="&#92;n"= |
+   * Example: =%<nop>SETGETDUMPALL{"| $<nop>store | $<nop>namespace | $<nop>key | $<nop>value |" separator="$<nop>n"}%=%IF{"'%INCLUDINGTOPIC%'!='SetGetPlugin'" then=" - [[SetGetPlugin#SetGetExamples][see more examples]]." }%
+   * Related: [[%IF{"'%INCLUDINGTOPIC%'='TWikiVariables' OR '%INCLUDINGTOPIC%'='SetGetPlugin'" then="#"}%VarGET][GET]], [[%IF{"'%INCLUDINGTOPIC%'='TWikiVariables'" then="#"}%VarIF][IF]], [[%IF{"'%INCLUDINGTOPIC%'='TWikiVariables' OR '%INCLUDINGTOPIC%'='SetGetPlugin'" then="#"}%VarSET][SET]], %IF{"'%INCLUDINGTOPIC%'!='SetGetPlugin'" then="SetGetPlugin, "}%SpreadSheetPlugin#FuncSET
