@@ -1,0 +1,344 @@
+Options: -clean
+exporting TWIKI_ASSERTS=1 for extra checking; disable by exporting TWIKI_ASSERTS=0
+Assert checking on 1
+Running SetGetPluginSuite
+Running SetGetPluginTests
+	SetGetPluginTests::test_loadConfigSpecDefaultConfig
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1, _loadConfigSpec => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1, _loadConfigSpec => 1}
+	          _loadConfigSpec 
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/bBhkIy_oyM/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+
+================================================================================================================================================
+	SetGetPluginTests::test_default_param_works
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+	          VarGET {_DEFAULT => SetGetPluginTests_test_default_param_works, default => default_ans}
+	          VarGET -   get persistent returning 
+	          VarGET -   get default returning default_ans
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/yJqf03s5rz/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+
+================================================================================================================================================
+	SetGetPluginTests::test_saveStoresSavesInRightFormatsAndConvertsBetweenFormats
+	SetGetPluginTests::test_set_namespace_remember
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, remember => 1, value => v0}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, namespace => ns1, remember => 1, value => v1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, namespace => ns2, remember => 1, value => v2}
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, namespace => ns1}
+	          VarGET -   get persistent returning v1
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, namespace => ns2}
+	          VarGET -   get persistent returning v2
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember}
+	          VarGET -   get persistent returning v0
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/xT3Z5ge1sV/work_areas/SetGetPlugin/persistentvars.dat==
+$PersistentVars = {
+                    'defaultNamespace' => {
+                                            'SetGetPluginTests_test_set_namespace_remember' => 'v0'
+                                          },
+                    'ns2' => {
+                               'SetGetPluginTests_test_set_namespace_remember' => 'v2'
+                             },
+                    'ns1' => {
+                               'SetGetPluginTests_test_set_namespace_remember' => 'v1'
+                             }
+                  };
+
+
+================================================================================================================================================
+	SetGetPluginTests::test_undeclared_stores_behaviours
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/hBsxr7L6Sw/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+== STOREFILE default @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/hBsxr7L6Sw/work_areas/SetGetPlugin/default.dat does not exist==
+
+================================================================================================================================================
+	SetGetPluginTests::test_set_store_remember
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_remember, remember => 1, store => st1, value => v1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_remember, remember => 1, store => st2, value => v2}
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_remember, store => st1}
+	          VarGET -   get persistent returning v1
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_remember, store => st2}
+	          VarGET -   get persistent returning v2
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/CZnON7_Dur/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+== STOREFILE st1 @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/CZnON7_Dur/work_areas/SetGetPlugin/st1.dat==
+$PersistentVars = {
+                    'defaultNamespace' => {
+                                            'SetGetPluginTests_test_set_store_remember' => 'v1'
+                                          }
+                  };
+
+== STOREFILE st2 @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/CZnON7_Dur/work_areas/SetGetPlugin/st2.dat==
+$PersistentVars = {
+                    'defaultNamespace' => {
+                                            'SetGetPluginTests_test_set_store_remember' => 'v2'
+                                          }
+                  };
+
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/CZnON7_Dur/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+== STOREFILE st1 @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/CZnON7_Dur/work_areas/SetGetPlugin/st1.dat==
+$PersistentVars = {
+                    'defaultNamespace' => {
+                                            'SetGetPluginTests_test_set_store_remember' => 'v1'
+                                          }
+                  };
+
+== STOREFILE st2 @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/CZnON7_Dur/work_areas/SetGetPlugin/st2.dat==
+$PersistentVars = {
+                    'defaultNamespace' => {
+                                            'SetGetPluginTests_test_set_store_remember' => 'v2'
+                                          }
+                  };
+
+
+================================================================================================================================================
+	SetGetPluginTests::test_set_volatile
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_volatile, value => v1}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_volatile to v1
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_volatile}
+	          VarGET -   get volatile returning v1
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/2pH51SOzkl/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+
+================================================================================================================================================
+	SetGetPluginTests::test_set_store_remember_parallel_access
+* Tests that a changed store file results in a reload of the underlying file
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1, _getPersistentHash => 1, _loadConfigSpec => 1, _loadPersistentVarsStorableLock => 1, _loadPersistentVarsTWikiReadFile => 1, _loadStore => 1, _setPersistentHash => 1}
+	          _loadConfigSpec 
+	           _loadStore (defaultStore)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1, _getPersistentHash => 1, _loadConfigSpec => 1, _loadPersistentVarsStorableLock => 1, _loadPersistentVarsTWikiReadFile => 1, _loadStore => 1, _setPersistentHash => 1}
+	          _loadConfigSpec 
+	           _loadStore (defaultStore)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, remember => 1, store => st1, value => v1}
+	              _loadStore (st1)
+	              _loadStore timestamp = $VAR1 = undef;
+
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, remember => 1, store => st1, value => v2}
+	              _loadStore (st1)
+	              _loadStore timestamp = $VAR1 = 1335745804;
+
+	               _loadPersistentVarsStorableLock (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/dayDTXZCQC/work_areas/SetGetPlugin/st1.store)
+* If two pages write to the same remembered store value, and write from access B follows write from access A
+should an in-page access from A look back at the store (& get value B) or should it look in the in-memory version?
+
+Answer: it should get its in-memory version
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, store => st1}
+	          VarGET -   get persistent returning v1
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, store => st1}
+	          VarGET -   get persistent returning v1
+* Access from session 1 that has a local value v1
+* Access from session 2 takes the same local value, v1
+* However, if one page writes to a remembered store value, and another page looks up that value and does not have an
+in-memory value then it should not find a value as it is using a volatile setting
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1, _getPersistentHash => 1, _loadConfigSpec => 1, _loadPersistentVarsStorableLock => 1, _loadPersistentVarsTWikiReadFile => 1, _loadStore => 1, _setPersistentHash => 1}
+	          _loadConfigSpec 
+	           _loadStore (defaultStore)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, store => st1}
+	          VarGET -   get persistent returning 
+* Access from a page that doesn't have a local value, so should find nothing 
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/dayDTXZCQC/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+== STOREFILE st1 @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/dayDTXZCQC/work_areas/SetGetPlugin/st1.store==
+pst012345678      
+v19   SetGetPluginTests_test_set_store_remember_parallel_access   defaultNamespace
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/dayDTXZCQC/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+
+================================================================================================================================================
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/dayDTXZCQC/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+== STOREFILE st1 @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/dayDTXZCQC/work_areas/SetGetPlugin/st1.store==
+pst012345678      
+v19   SetGetPluginTests_test_set_store_remember_parallel_access   defaultNamespace
+
+================================================================================================================================================
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/dayDTXZCQC/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+== STOREFILE st1 @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/dayDTXZCQC/work_areas/SetGetPlugin/st1.store==
+pst012345678      
+v19   SetGetPluginTests_test_set_store_remember_parallel_access   defaultNamespace
+
+================================================================================================================================================
+	SetGetPluginTests::test_set_namespace_volatile_should_be_ignored
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_volatile_should_be_ignored, namespace => ns1, value => v1}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_namespace_volatile_should_be_ignored to v1
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_volatile_should_be_ignored, namespace => ns2, value => v2}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_namespace_volatile_should_be_ignored to v2
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_volatile_should_be_ignored, namespace => ns1}
+	          VarGET -   get volatile returning v2
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_volatile_should_be_ignored, namespace => ns2}
+	          VarGET -   get volatile returning v2
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/qzupkR9wmK/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+
+================================================================================================================================================
+	SetGetPluginTests::test_loadConfigSpecExtraStores
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1, _loadConfigSpec => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/TnvWUIRiF9/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+== STOREFILE storeExtension @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/TnvWUIRiF9/work_areas/SetGetPlugin/storeExtension.store does not exist==
+== STOREFILE noExtension @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/TnvWUIRiF9/work_areas/SetGetPlugin/noExtension.dat does not exist==
+== STOREFILE datExtension @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/TnvWUIRiF9/work_areas/SetGetPlugin/datExtension.dat does not exist==
+
+================================================================================================================================================
+	SetGetPluginTests::test_set_doesnt_care_about_web
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_doesnt_care_about_web, remember => 1, value => v1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_doesnt_care_about_web, remember => 1, value => v2}
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_doesnt_care_about_web}
+	          VarGET -   get persistent returning v2
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_doesnt_care_about_web}
+	          VarGET -   get persistent returning v2
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/lBQN3fAf4h/work_areas/SetGetPlugin/persistentvars.dat==
+$PersistentVars = {
+                    'defaultNamespace' => {
+                                            'SetGetPluginTests_test_set_doesnt_care_about_web' => 'v2'
+                                          }
+                  };
+
+
+================================================================================================================================================
+	SetGetPluginTests::test_client_scenario1
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+	          VarSET {_DEFAULT => dummyvar_001, remember => 1, store => newdat, value => cello1}
+	          VarGET {_DEFAULT => dummyvar_001, store => newdat}
+	          VarGET -   get persistent returning cello1
+	          VarSET {_DEFAULT => dummyvar_001, remember => 1, store => newstore, value => cello2}
+	          VarGET {_DEFAULT => dummyvar_001, store => newstore}
+	          VarGET -   get persistent returning cello2
+	          VarGET {_DEFAULT => dummyvar_001}
+	          VarGET -   get persistent returning 
+	          VarGET {_DEFAULT => dummyvar_001}
+	          VarGET -   get persistent returning 
+	          VarSET {_DEFAULT => dummyvar_001, namespace => ns1, remember => 1, value => cello1}
+	          VarGET {_DEFAULT => dummyvar_001, namespace => ns1}
+	          VarGET -   get persistent returning cello1
+	          VarSET {_DEFAULT => dummyvar_001, namespace => ns2, remember => 1, value => cello2}
+	          VarGET {_DEFAULT => dummyvar_001, namespace => ns2}
+	          VarGET -   get persistent returning cello2
+	          VarGET {_DEFAULT => dummyvar_001}
+	          VarGET -   get persistent returning 
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/pnx8rjclzG/work_areas/SetGetPlugin/persistentvars.dat==
+$PersistentVars = {
+                    'defaultNamespace' => {},
+                    'ns2' => {
+                               'dummyvar_001' => 'cello2'
+                             },
+                    'ns1' => {
+                               'dummyvar_001' => 'cello1'
+                             }
+                  };
+
+== STOREFILE newstore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/pnx8rjclzG/work_areas/SetGetPlugin/new.store==
+pst012345678      
+cello2   dummyvar_001   defaultNamespace
+== STOREFILE newdat @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/pnx8rjclzG/work_areas/SetGetPlugin/new.dat==
+$PersistentVars = {
+                    'defaultNamespace' => {
+                                            'dummyvar_001' => 'cello1'
+                                          }
+                  };
+
+
+================================================================================================================================================
+	SetGetPluginTests::test_loadImportsLegacyNonNamespacedPersistentVars_incomplete
+* Previous releases of SetGetPlugin did not use namespaces. So we need to make sure those get put into the defaultNamespace
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1, _loadConfigSpec => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/kZ4Gy4KvrG/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+
+================================================================================================================================================
+*** 
+Expected:'done'
+ But got:'not done'
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f99d3a9cae8)', 'done', 'not done') called at SetGetPlugin//SetGetPluginTests.pm line 462
+	SetGetPluginTests::test_loadImportsLegacyNonNamespacedPersistentVars_incomplete('SetGetPluginTests=HASH(0x7f99d3a9cae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f99d3922b80)', 'HASH(0x7f99d3ca5ba0)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f99d38277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'done\'\x{a} But got:\'not done\'\x{a} at /Volumes/Storage...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'done\'\x{a} But got:\'not done\'\x{a} at /Volumes/Storage...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'done\'\x{a} But got:\'not done\'\x{a} at /Volumes/Storage...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7f99d3a9cae8)', '', 'Expected:\'done\'\x{a} But got:\'not done\'\x{a}') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f99d3a9cae8)', 'done', 'not done') called at SetGetPlugin//SetGetPluginTests.pm line 462
+	SetGetPluginTests::test_loadImportsLegacyNonNamespacedPersistentVars_incomplete('SetGetPluginTests=HASH(0x7f99d3a9cae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f99d3922b80)', 'HASH(0x7f99d3ca5ba0)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f99d38277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+	SetGetPluginTests::test_set_remember
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_remember, remember => 1, value => v1}
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_remember}
+	          VarGET -   get persistent returning v1
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/s8c_KVWRpR/work_areas/SetGetPlugin/persistentvars.dat==
+$PersistentVars = {
+                    'defaultNamespace' => {
+                                            'SetGetPluginTests_test_set_remember' => 'v1'
+                                          }
+                  };
+
+
+================================================================================================================================================
+	SetGetPluginTests::test_set_store_not_remembered_does_not_need_to_work
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work, store => store1, value => v1}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work to v1
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work, store => store2, value => v2}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work to v2
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work, store => store1}
+	          VarGET -   get volatile returning v2
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work, store => store2}
+	          VarGET -   get volatile returning v2
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/nNokjyjYlA/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+
+================================================================================================================================================
+	SetGetPluginTests::test_persistentVarsIsDefault
+	         new overriding key DebugBreakSub (previous value {}) with debug set up value={DESTROY => 1}
+	         new overriding key DebugTraceSub (previous value {new => 1}) with debug set up value={VarGET => 1, VarSET => 1}
+== STOREFILE defaultStore @ /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/VobOmfXYT5/work_areas/SetGetPlugin/persistentvars.dat does not exist==
+
+================================================================================================================================================
+1 failures
+SetGetPluginTests::test_loadImportsLegacyNonNamespacedPersistentVars_incomplete
+
+Expected:'done'
+ But got:'not done'
+ at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f99d3a9cae8)', 'done', 'not done') called at SetGetPlugin//SetGetPluginTests.pm line 462
+	SetGetPluginTests::test_loadImportsLegacyNonNamespacedPersistentVars_incomplete('SetGetPluginTests=HASH(0x7f99d3a9cae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f99d3922b80)', 'HASH(0x7f99d3ca5ba0)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f99d38277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called at ../bin/TestRunner.pl line 99
+ at /Volumes/Storage/martincleaver/Sites/cn/core/test/unit/TWikiTestCase.pm line 25
+	TWikiTestCase::__ANON__('\x{a}Expected:\'done\'\x{a} But got:\'not done\'\x{a} at /Volumes/Storage...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 354
+	CGI::Carp::realdie('\x{a}Expected:\'done\'\x{a} But got:\'not done\'\x{a} at /Volumes/Storage...') called at /opt/local/lib/perl5/5.12.3/CGI/Carp.pm line 439
+	CGI::Carp::die('\x{a}Expected:\'done\'\x{a} But got:\'not done\'\x{a} at /Volumes/Storage...') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 122
+	Unit::TestCase::assert('SetGetPluginTests=HASH(0x7f99d3a9cae8)', '', 'Expected:\'done\'\x{a} But got:\'not done\'\x{a}') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestCase.pm line 127
+	Unit::TestCase::assert_equals('SetGetPluginTests=HASH(0x7f99d3a9cae8)', 'done', 'not done') called at SetGetPlugin//SetGetPluginTests.pm line 462
+	SetGetPluginTests::test_loadImportsLegacyNonNamespacedPersistentVars_incomplete('SetGetPluginTests=HASH(0x7f99d3a9cae8)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 49
+	Unit::TestRunner::__ANON__() called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 379
+	eval {...} called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/CPAN/lib/Error.pm line 371
+	Error::subs::try('CODE(0x7f99d3922b80)', 'HASH(0x7f99d3ca5ba0)') called at /Volumes/Storage/martincleaver/Sites/cn/core/lib/Unit/TestRunner.pm line 55
+	Unit::TestRunner::start('Unit::TestRunner=HASH(0x7f99d38277c8)', 'SetGetPlugin/SetGetPluginSuite.pm') called
+
+15 of 16 test cases passed

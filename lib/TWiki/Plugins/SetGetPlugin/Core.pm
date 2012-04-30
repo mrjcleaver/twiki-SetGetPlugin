@@ -70,7 +70,8 @@ sub new {
 
     if (ref ($debugParam) eq "HASH") {
         foreach my $key (keys %$debugParam) {
-            $this->debug('overriding key '.$key.' (previous value '.$this->{$key}.') with debug set up value='.Dumper($debugParam->{$key})) if $this->{Debug};
+            $this->debug('overriding key '.$key.' (previous value '.$this->_formatParameters($this->{$key}).
+                         ') with debug set up value='.$this->_formatParameters($debugParam->{$key})) if $this->{Debug};
             $this->{$key} = $debugParam->{$key};
         }
     }    
@@ -221,7 +222,7 @@ sub VarGET
 {
     my ( $this, $session, $params, $topic, $web ) = @_;
     my $name  = _sanitizeName( $params->{_DEFAULT} );
-    $this->debug( "GET (".Dumper($params).")" ) if $this->{Debug};
+    $this->debug( $this->_formatParameters($params) ) if $this->{Debug};
     return '' unless( $name );
 
     my $value = '';
@@ -272,7 +273,13 @@ sub _setPersistentHash
     # TODO: assert all parameters are set
     $this->{PersistentVars}{$store}{$namespace}{$name} = $value;
     $this->debug( "Hash now ". Dumper($this->{PersistentVars})) if $this->{Debug} > 1;
+}
 
+sub _formatParameters
+{
+    my ($this, $params) = @_;
+    $DB::single = 1;
+    return "{".join(", ", sort map { "$_ => $params->{$_}" } keys %$params)."}";
 }
 
 
@@ -283,7 +290,7 @@ sub VarSET
     my $name  = _sanitizeName( $params->{_DEFAULT} );
 
     my $value = $params->{value};
-    $this->debug( "SET ($name = $value)".Dumper($params) ) if $this->{Debug};
+    $this->debug( $this->_formatParameters($params) ) if $this->{Debug};
      
     return '' unless( $name );
     return '' unless( defined $value );
@@ -292,7 +299,7 @@ sub VarSET
     if( $remember && ! ( $remember =~ /^off$/i ) ) {
         $this->_savePersistentVar($name, $value, $params );    
     } else {
-        $this->debug( "-   set volatile -> $value" ) if $this->{Debug};
+        $this->debug( "-   setting volatile $name to $value" ) if $this->{Debug};
         $this->{VolatileVars}{$name} = $value;
     }
     return '';

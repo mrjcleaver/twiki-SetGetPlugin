@@ -43,7 +43,7 @@ sub list_tests {
 sub narrate {
     my ($this, $message) = @_;
     my $caller = subname(2);
-    print "* ".$message."\n" if $this->{Debug}; 
+    print "* ".$message."\n" if $this->{DebuggedSettings}->{Debug}; 
 }
 
 sub narrateDebug {
@@ -443,7 +443,7 @@ sub test_loadConfigSpecExtraStores {
     $this->assert_equals("datExtension.dat", $setgetplugin->{StoreFileMapping}{datExtension});
 }
 
-sub test_loadImportsLegacyNonNamespacedPersistentVars {
+sub test_loadImportsLegacyNonNamespacedPersistentVars_incomplete {
     my $this = shift;
     my $keyname = subname();
     
@@ -456,12 +456,10 @@ sub test_loadImportsLegacyNonNamespacedPersistentVars {
     
     my $legacyFormat =<<"EOM";
 \$PersistentVars = {
-                    'defaultNamespace' => {
-                                            '$keyname' => 'cello'
-                                          }
+                        '$keyname' => 'cello'
                   };
 EOM
-    
+    $this->assert_equals("done", "not done");
 }
 
 
