@@ -1,0 +1,179 @@
+Options: -clean
+exporting TWIKI_ASSERTS=1 for extra checking; disable by exporting TWIKI_ASSERTS=0
+Assert checking on 1
+Running SetGetPluginSuite
+Running SetGetPluginTests
+	SetGetPluginTests::test_create_stores_on_the_fly
+	          VarSET {_DEFAULT => SetGetPluginTests_test_create_stores_on_the_fly, remember => 1, store => st1, value => v1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_create_stores_on_the_fly, remember => 1, store => st2, value => v2}
+	          VarGET {_DEFAULT => SetGetPluginTests_test_create_stores_on_the_fly, store => st1}
+	          VarGET -   get persistent returning 'v1'
+	          VarGET {_DEFAULT => SetGetPluginTests_test_create_stores_on_the_fly, store => st2}
+	          VarGET -   get persistent returning 'v2'
+	SetGetPluginTests::test_loadConfigSpecDefaultConfig
+	          _loadConfigSpec 
+	SetGetPluginTests::test_default_param_works
+	          VarGET {_DEFAULT => SetGetPluginTests_test_default_param_works, default => default_ans}
+	          VarGET -   get persistent returning ''
+	          VarGET -   get default returning 'default_ans'
+	SetGetPluginTests::test_saveStoresSavesInRightFormatsAndConvertsBetweenFormats
+	          _loadConfigSpec 
+	           _loadStore (defaultStore)
+	            _storeFileForStore (defaultStore) actually using store (defaultStore) in persistentvars.dat
+	           _loadStore timestamp = $VAR1 = undef;
+
+	           _loadStore (dat1)
+	            _storeFileForStore (dat1) actually using store (dat1) in dat1.dat
+	           _loadStore timestamp = $VAR1 = undef;
+
+	           _loadStore (store1)
+	            _storeFileForStore (store1) actually using store (store1) in store1.store
+	           _loadStore timestamp = $VAR1 = undef;
+
+	          VarSET {_DEFAULT => SetGetPluginTests_test_saveStoresSavesInRightFormatsAndConvertsBetweenFormats, remember => 1, value => cello}
+	            _saveStore (defaultStore)
+	              _loadStore (defaultStore)
+	               _storeFileForStore (defaultStore) actually using store (defaultStore) in persistentvars.dat
+	              _loadStore timestamp = $VAR1 = undef;
+
+	             _storeFileForStore (defaultStore) actually using store (defaultStore) in persistentvars.dat
+	             _savePersistentVarsTWikiReadFile (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/lrIQweDtMk/work_areas/SetGetPlugin/persistentvars.dat)
+	         _storeFileForStore (defaultStore) actually using store (defaultStore) in persistentvars.dat
+	         _storeFileForStore (store1) actually using store (store1) in store1.store
+	         _convertPersistentVarsIntoStorableLock (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/lrIQweDtMk/work_areas/SetGetPlugin/persistentvars.dat, /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/lrIQweDtMk/work_areas/SetGetPlugin/store1.store)
+	          _savePersistentVarsStorableLock (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/lrIQweDtMk/work_areas/SetGetPlugin/store1.store)
+	         _storeFileForStore (dat1) actually using store (dat1) in dat1.dat
+	         _convertStorableLockIntoPersistentVars (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/lrIQweDtMk/work_areas/SetGetPlugin/store1.store, /var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/lrIQweDtMk/work_areas/SetGetPlugin/dat1.dat)
+	          _savePersistentVarsTWikiReadFile (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/lrIQweDtMk/work_areas/SetGetPlugin/dat1.dat)
+	SetGetPluginTests::test_set_namespace_remember
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, remember => 1, value => v0}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, namespace => ns1, remember => 1, value => v1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, namespace => ns2, remember => 1, value => v2}
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, namespace => ns1}
+	          VarGET -   get persistent returning 'v1'
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember, namespace => ns2}
+	          VarGET -   get persistent returning 'v2'
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_remember}
+	          VarGET -   get persistent returning 'v0'
+	SetGetPluginTests::test_unallowed_stores_should_revert_to_default
+	SetGetPluginTests::test_set_volatile
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_volatile, value => v1}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_volatile to v1
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_volatile}
+	          VarGET -   get volatile returning 'v1'
+	SetGetPluginTests::test_fixUpDataStructure
+	          VarSET {_DEFAULT => Reload, remember => 1, value => File}
+	              _loadStore (defaultStore)
+	              _loadStore timestamp = $VAR1 = 1335811521;
+
+	          VarGET {_DEFAULT => MilestoneID00078_UNIX}
+	          VarGET -   get persistent returning '1333116558'
+	          VarGET {_DEFAULT => MilestoneID00078_UNIX, namespace => defaultNamespace}
+	          VarGET -   get persistent returning '1333116558'
+	          VarGET {_DEFAULT => HoldMilestoneID00153_UNIX, namespace => ns1}
+	          VarGET -   get persistent returning '1333131708'
+	          VarGET {_DEFAULT => MilestoneID00097_BL, namespace => ns2}
+	          VarGET -   get persistent returning '1333132500'
+	SetGetPluginTests::test_set_store_remember_parallel_access
+	          _loadConfigSpec 
+	           _loadStore (defaultStore)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	           _loadStore (Store2)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	           _loadStore (Store1)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	          _loadConfigSpec 
+	           _loadStore (defaultStore)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	           _loadStore (Store2)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	           _loadStore (Store1)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, remember => 1, store => st1, value => v1}
+	              _loadStore (st1)
+	              _loadStore timestamp = $VAR1 = undef;
+
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, remember => 1, store => st1, value => v2}
+	              _loadStore (st1)
+	              _loadStore timestamp = $VAR1 = 1335811522;
+
+	               _loadPersistentVarsStorableLock (/var/folders/sn/z7374bjd6tg98d_b717fk91w0000gn/T/r2kJ5Gp1AV/work_areas/SetGetPlugin/st1.store)
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, store => st1}
+	          VarGET -   get persistent returning 'v1'
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, store => st1}
+	          VarGET -   get persistent returning 'v1'
+	          _loadConfigSpec 
+	           _loadStore (defaultStore)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	           _loadStore (Store2)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	           _loadStore (Store1)
+	           _loadStore timestamp = $VAR1 = undef;
+
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_remember_parallel_access, store => st1}
+	          VarGET -   get persistent returning ''
+	SetGetPluginTests::test_set_namespace_volatile_should_be_ignored
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_volatile_should_be_ignored, namespace => ns1, value => v1}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_namespace_volatile_should_be_ignored to v1
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_namespace_volatile_should_be_ignored, namespace => ns2, value => v2}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_namespace_volatile_should_be_ignored to v2
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_volatile_should_be_ignored, namespace => ns1}
+	          VarGET -   get volatile returning 'v2'
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_namespace_volatile_should_be_ignored, namespace => ns2}
+	          VarGET -   get volatile returning 'v2'
+	SetGetPluginTests::test_loadConfigSpecExtraStores
+	SetGetPluginTests::test_set_doesnt_care_about_web
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_doesnt_care_about_web, remember => 1, value => v1}
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_doesnt_care_about_web, remember => 1, value => v2}
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_doesnt_care_about_web}
+	          VarGET -   get persistent returning 'v2'
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_doesnt_care_about_web}
+	          VarGET -   get persistent returning 'v2'
+	SetGetPluginTests::test_client_scenario1
+	          VarSET {_DEFAULT => dummyvar_001, remember => 1, store => newdat, value => cello1}
+	          VarGET {_DEFAULT => dummyvar_001, store => newdat}
+	          VarGET -   get persistent returning 'cello1'
+	          VarSET {_DEFAULT => dummyvar_001, remember => 1, store => newstore, value => cello2}
+	          VarGET {_DEFAULT => dummyvar_001, store => newstore}
+	          VarGET -   get persistent returning 'cello2'
+	          VarGET {_DEFAULT => dummyvar_001}
+	          VarGET -   get persistent returning ''
+	          VarGET {_DEFAULT => dummyvar_001}
+	          VarGET -   get persistent returning ''
+	          VarSET {_DEFAULT => dummyvar_001, namespace => ns1, remember => 1, value => cello1}
+	          VarGET {_DEFAULT => dummyvar_001, namespace => ns1}
+	          VarGET -   get persistent returning 'cello1'
+	          VarSET {_DEFAULT => dummyvar_001, namespace => ns2, remember => 1, value => cello2}
+	          VarGET {_DEFAULT => dummyvar_001, namespace => ns2}
+	          VarGET -   get persistent returning 'cello2'
+	          VarGET {_DEFAULT => dummyvar_001}
+	          VarGET -   get persistent returning ''
+	         VarDUMPALL DUMPALL
+	          VarDUMP DUMP (defaultStore, defaultNamespace, )
+	          VarDUMP DUMP (Store2, defaultNamespace, )
+	          VarDUMP DUMP (newstore, defaultNamespace, )
+	          VarDUMP DUMP (Store1, defaultNamespace, )
+	          VarDUMP DUMP (newdat, defaultNamespace, )
+	SetGetPluginTests::test_set_remember
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_remember, remember => 1, value => v1}
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_remember}
+	          VarGET -   get persistent returning 'v1'
+	SetGetPluginTests::test_set_store_not_remembered_does_not_need_to_work
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work, store => store1, value => v1}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work to v1
+	          VarSET {_DEFAULT => SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work, store => store2, value => v2}
+	          VarSET -   setting volatile SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work to v2
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work, store => store1}
+	          VarGET -   get volatile returning 'v2'
+	          VarGET {_DEFAULT => SetGetPluginTests_test_set_store_not_remembered_does_not_need_to_work, store => store2}
+	          VarGET -   get volatile returning 'v2'
+	SetGetPluginTests::test_persistentVarsIsDefault
+All tests passed (16)

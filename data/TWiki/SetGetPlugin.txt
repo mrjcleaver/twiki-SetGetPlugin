@@ -38,6 +38,8 @@ Alternatives to this plugin are:
 
 %INCLUDE{"VarSETGETDUMP"}%
 
+%INCLUDE{"VarSETGETDUMPALL"}%
+
 #SetGetExamples
 ---++ Examples
 
@@ -195,7 +197,7 @@ Plugin settings are stored as preferences variables. To reference a plugin setti
    * One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
       * Set SHORTDESCRIPTION = Set and get variables in topics, optionally persistently across topic views
 
-   * Debug plugin: (See output in =data/debug.txt=)
+   * Debug plugin: (0, 1, or 3 - See output in =data/debug.txt=)
       * Set DEBUG = 0
 
 ---++ Plugin Installation Instructions

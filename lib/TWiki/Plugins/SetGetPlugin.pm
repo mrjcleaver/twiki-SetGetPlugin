@@ -53,6 +53,7 @@ sub initPlugin
     TWiki::Func::registerTagHandler( 'GET',    \&_GET );
     TWiki::Func::registerTagHandler( 'SET',    \&_SET );
     TWiki::Func::registerTagHandler( 'SETGETDUMP',    \&_DUMP );
+    TWiki::Func::registerTagHandler( 'SETGETDUMPALL',    \&_DUMPALL );
 
     # Plugin correctly initialized
     TWiki::Func::writeDebug( "- TWiki::Plugins::SetGetPlugin::initPlugin( $web.$topic ) is OK" ) if $debug;
@@ -71,6 +72,19 @@ sub _DUMP
         $core = new TWiki::Plugins::SetGetPlugin::Core( $debug );
     }
     return $core->VarDUMP( @_ );
+}
+
+# =========================
+sub _DUMPALL
+{
+#   my ( $session, $params, $theTopic, $theWeb ) = @_;
+
+    # Lazy loading, e.g. compile core module only when required
+    unless( $core ) {
+        require TWiki::Plugins::SetGetPlugin::Core;
+        $core = new TWiki::Plugins::SetGetPlugin::Core( $debug );
+    }
+    return $core->VarDUMPALL( @_ );
 }
 
 # =========================

@@ -54,7 +54,8 @@ sub new {
           },
           StoreTimeStamps => {
             "defaultStore" => 0,
-          }
+          },
+          Debug => 0
         };
 
     my $debugFlag = undef;
@@ -71,7 +72,7 @@ sub new {
     if (ref ($debugParam) eq "HASH") {
         foreach my $key (keys %$debugParam) {
             $this->debug('overriding key '.$key.' (previous value '.$this->_formatParameters($this->{$key}).
-                         ') with debug set up value='.$this->_formatParameters($debugParam->{$key})) if $this->{Debug};
+                         ') with debug set up value='.$this->_formatParameters($debugParam->{$key})) if $this->{Debug} > 1;
             $this->{$key} = $debugParam->{$key};
         }
     }    
@@ -131,7 +132,8 @@ sub _defaultStoreFileForStoreName {
         
 sub DESTROY {
     my ($this) = @_;
-    if ($this->{Debug}) {
+    if ($this->{Debug} > 1) {
+        print "\n====== DESTROYING\n";        
         $this->debug($this); # already in if $this->{Debug};   
         $this->_dumpStores();
         print "\n================================================================================================================================================\n";
@@ -190,6 +192,10 @@ sub _storeFileExists {
 }
 
 # =========================
+=pod
+If you omit store, you get defaultStore
+=cut
+
 sub VarDUMP
 {
     my ( $this, $session, $params, $topic, $web ) = @_;
@@ -199,7 +205,7 @@ sub VarDUMP
     $this->debug( "DUMP ($store, $namespace, $name)" ) if $this->{Debug};
     #return '' unless( $name );
 
-    my $value = '';
+    my $output = '';
     my $hold = '';
     my $sep = "\n";
     my $format = "key: \$key, value: \$value <br />";
@@ -208,12 +214,35 @@ sub VarDUMP
     $sep = $params->{separator} if( defined $params->{separator} );
 
     $sep =~ s/\$n/\n/g;
-    while( my ($k, $v) = each %{$this->{PersistentVars}{$store}{$namespace}} ) {
-        $hold = $format;
-        $hold =~ s/\$key/$k/g;
-        $hold =~ s/\$value/$v/g;
-        $value .= "$hold$sep";
+    while( my ($namespace) = each %{$this->{PersistentVars}{$store}}) {
+        while( my ($key, $value) = each %{$this->{PersistentVars}{$store}{$namespace}}) {
+            $hold = $format;
+            $hold =~ s/\$store/$store/g;
+            $hold =~ s/\$namespace/$namespace/g;
+            $hold =~ s/\$key/$key/g;
+            $hold =~ s/\$value/$value/g;
+            $output .= "$hold$sep";
+        }
     }
+    return $output;
+}
+
+sub VarDUMPALL
+{
+    my ( $this, $session, $params, $topic, $web ) = @_;
+    my $name  = _sanitizeName( $params->{_DEFAULT} );
+    
+    $this->debug( "DUMPALL" ) if $this->{Debug};
+    
+    if (! defined $params->{format}) {
+        $params->{format} = "store: \$store namespace: \$namespace key: \$key, value: \$value <br />";
+    }
+    
+    my $value = '';
+    foreach my $store (keys %{$this->{StoreFileMapping}}) {
+        $params->{store} = $store;
+        $value .= $this->VarDUMP($session, $params, $topic, $web);
+    }   
     return $value;
 }
 
@@ -228,15 +257,15 @@ sub VarGET
     my $value = '';
     if( defined $this->{VolatileVars}{$name} ) {
         $value = $this->{VolatileVars}{$name};
-        $this->debug( "-   get volatile returning $value" ) if $this->{Debug};
+        $this->debug( "-   get volatile returning '$value'" ) if $this->{Debug};
     } else {
         $value = $this->_getPersistentHash($name, $params);
-        $this->debug( "-   get persistent returning $value" ) if $this->{Debug};
+        $this->debug( "-   get persistent returning '$value'" ) if $this->{Debug};
     }
     
     if (! $value && defined $params->{default} ) {
         $value = $params->{default};
-        $this->debug( "-   get default returning $value" ) if $this->{Debug};
+        $this->debug( "-   get default returning '$value'" ) if $this->{Debug};
     } 
     return $value;
 }
@@ -357,6 +386,23 @@ sub _loadStore
     $this->debug( "Loaded". Dumper($this->{PersistentVars}{$storeName})) if $this->{Debug} > 1;
 }
 
+
+sub _fixUpDataStructure
+{
+    my ($this, $inputHash) = @_;
+    $this->debug("INPUT". Dumper($inputHash)) if $this->{Debug} > 1;
+    my $outputHash = $inputHash; #TODO - consider Storable's dclone - without it $input = $output as aliased here.
+    
+    foreach my $key (keys %$outputHash) {
+        if (ref $outputHash->{$key} ne 'HASH') {
+            $outputHash->{'defaultNamespace'}{$key} = $outputHash->{$key};
+            delete $outputHash->{$key};
+        }
+    }
+    $this->debug("OUTPUT". Dumper($outputHash)) if $this->{Debug} > 1;
+    return $outputHash;
+}
+
 sub _loadPersistentVarsTWikiReadFile {
     my ($this, $storeFile) = @_;
     $this->debug( "($storeFile)" ) if $this->{Debug};   
@@ -364,8 +410,9 @@ sub _loadPersistentVarsTWikiReadFile {
     my $text = TWiki::Func::readFile( $storeFile );
     $text =~ /^(.*)$/gs; # untaint, it's safe because an internal file
     $text = $1;
-    use vars qw($PersistentVars);
+    our $PersistentVars;
     my $hashref = eval $text; # sets variable $PersistentVars, with side effect to return value to end up in $hashref
+    $hashref = $this->_fixUpDataStructure($hashref);
     return $hashref;
 };
 
@@ -429,6 +476,7 @@ sub _storeFileForStore {
         my $behaviour = $this->{UndeclaredStoresBehaviour};
         if ($behaviour eq 'revertToDefault') {
             # change the store name to use the default store
+            TWiki::Func::writeWarning("Use of undeclared store ".$storeNameParam. " but {SetGetPlugin}{UndeclaredStoresBehaviour} does not permit this (see configure)");            
             $storeName = 'defaultStore';
         } elsif ($behaviour eq 'createUnknown') {
             # accept the store name as is, and map the storeName
