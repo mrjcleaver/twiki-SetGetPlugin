@@ -9,5 +9,7 @@
      | ="name"= | Name of variable. Alphanumeric characters, dashes and underscores can be used. | (required) |
      | =value="..."= | Value of variable. Escape double quotes with backslash. | (required, may be empty) |
      | =remember="1"= | If set, the variable will be stored persistently so that it can be used later in any TWiki topic. [[SetGetPlugin#RememberNotes][See important notes]]. | ="0"= |
+     | =store="mystore"= | If set, the name of the separate store to keep the values in.  | ="defaultStore"= |
+     | =namespace="defaultNamespace"= | If set, the name of the separate namespace in the store to keep the values in.  | ="defaultNamespace"= |
    * Example: =%<nop>SET{"lunch" value="Sushi"}%=%IF{"'%INCLUDINGTOPIC%'!='SetGetPlugin'" then=" - [[SetGetPlugin#SetGetExamples][see more examples]]." }%
    * Related: [[%IF{"'%INCLUDINGTOPIC%'='TWikiVariables' OR '%INCLUDINGTOPIC%'='SetGetPlugin'" then="#"}%VarGET][GET]], [[%IF{"'%INCLUDINGTOPIC%'='TWikiVariables'" then="#"}%VarIF][IF]], [[%IF{"'%INCLUDINGTOPIC%'='TWikiVariables' OR '%INCLUDINGTOPIC%'='SetGetPlugin'" then="#"}%VarSETGETDUMP][SETGETDUMP]], %IF{"'%INCLUDINGTOPIC%'!='SetGetPlugin'" then="SetGetPlugin, "}%SpreadSheetPlugin#FuncSET

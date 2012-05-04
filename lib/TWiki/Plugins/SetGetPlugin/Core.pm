@@ -200,9 +200,10 @@ sub VarDUMP
 {
     my ( $this, $session, $params, $topic, $web ) = @_;
     my $name  = _sanitizeName( $params->{_DEFAULT} );
-    my ($store, $namespace)  = $this->_getStoreAndNamespaceFromParams($params);    
+    my $namespace = $params->{namespace}; # this should not default to defaultNamespace, we show all namespaces if omitted
+    my $store = $params->{store} || 'defaultStore';
 
-    $this->debug( "DUMP ($store, $namespace, $name)" ) if $this->{Debug};
+    $this->debug( "%SETGETDUMP{".$this->_formatParameters($params)."}%") if $this->{Debug};
     #return '' unless( $name );
 
     my $output = '';
@@ -213,8 +214,16 @@ sub VarDUMP
     $format = $params->{format} if( defined $params->{format} );
     $sep = $params->{separator} if( defined $params->{separator} );
 
+    $DB::single = 1;
+    return '' unless $this->{PersistentVars}; # nothing if undef
+    
+    my @namespaces = keys %{$this->{PersistentVars}{$store}};
+    if ($namespace) { # we're overriding the above line.
+        @namespaces = ($namespace);
+    } 
+    
     $sep =~ s/\$n/\n/g;
-    while( my ($namespace) = each %{$this->{PersistentVars}{$store}}) {
+    foreach my $namespace (@namespaces) {
         while( my ($key, $value) = each %{$this->{PersistentVars}{$store}{$namespace}}) {
             $hold = $format;
             $hold =~ s/\$store/$store/g;
@@ -224,6 +233,7 @@ sub VarDUMP
             $output .= "$hold$sep";
         }
     }
+    $this->debug(" returning ".$output) if $this->{Debug};
     return $output;
 }
 
@@ -232,7 +242,7 @@ sub VarDUMPALL
     my ( $this, $session, $params, $topic, $web ) = @_;
     my $name  = _sanitizeName( $params->{_DEFAULT} );
     
-    $this->debug( "DUMPALL" ) if $this->{Debug};
+    $this->debug( "SETGETDUMPALL{".$this->_formatParameters($params)."}%") if $this->{Debug};
     
     if (! defined $params->{format}) {
         $params->{format} = "store: \$store namespace: \$namespace key: \$key, value: \$value <br />";
@@ -251,7 +261,7 @@ sub VarGET
 {
     my ( $this, $session, $params, $topic, $web ) = @_;
     my $name  = _sanitizeName( $params->{_DEFAULT} );
-    $this->debug( $this->_formatParameters($params) ) if $this->{Debug};
+    $this->debug("%GET{".$this->_formatParameters($params)."}%") if $this->{Debug};
     return '' unless( $name );
 
     my $value = '';
@@ -270,7 +280,7 @@ sub VarGET
     return $value;
 }
 
-sub _getStoreAndNamespaceFromParams
+sub _getStoreAndNamespaceOrDefaultsFromParams
 {
     my ( $this, $params) = @_;
 
@@ -283,7 +293,7 @@ sub _getStoreAndNamespaceFromParams
 sub _getPersistentHash
 {
     my ($this, $name, $params) = @_;
-    my ($store, $namespace)  = $this->_getStoreAndNamespaceFromParams($params);    
+    my ($store, $namespace)  = $this->_getStoreAndNamespaceOrDefaultsFromParams($params);    
 
     $this->debug( "Hash for get ($store, $namespace) ". Dumper($this->{PersistentVars})) if $this->{Debug} > 1;
     my $value = '';    
@@ -297,7 +307,7 @@ sub _setPersistentHash
 {
     my ( $this, $name, $value, $params) = @_;
     
-    my ($store, $namespace)  = $this->_getStoreAndNamespaceFromParams($params);
+    my ($store, $namespace)  = $this->_getStoreAndNamespaceOrDefaultsFromParams($params);
 
     # TODO: assert all parameters are set
     $this->{PersistentVars}{$store}{$namespace}{$name} = $value;
@@ -307,8 +317,9 @@ sub _setPersistentHash
 sub _formatParameters
 {
     my ($this, $params) = @_;
-    $DB::single = 1;
-    return "{".join(", ", sort map { "$_ => $params->{$_}" } keys %$params)."}";
+    my $text = join(" ", sort map { "$_=\"$params->{$_}\"" } keys %$params);
+    $text =~ s/_DEFAULT=//;
+    return $text;
 }
 
 
@@ -319,7 +330,7 @@ sub VarSET
     my $name  = _sanitizeName( $params->{_DEFAULT} );
 
     my $value = $params->{value};
-    $this->debug( $this->_formatParameters($params) ) if $this->{Debug};
+    $this->debug( "%SET{".$this->_formatParameters($params)."}%" ) if $this->{Debug};
      
     return '' unless( $name );
     return '' unless( defined $value );
@@ -331,6 +342,7 @@ sub VarSET
         $this->debug( "-   setting volatile $name to $value" ) if $this->{Debug};
         $this->{VolatileVars}{$name} = $value;
     }
+    $this->debug(' was set to '.$value);
     return '';
 }
 
@@ -506,7 +518,7 @@ sub _savePersistentVar
     my ( $this, $name, $value, $params ) = @_;
     
     $this->_setPersistentHash($name, $value, $params);
-    my ($store, $unusednamespace) = $this->_getStoreAndNamespaceFromParams($params); 
+    my ($store, $unusednamespace) = $this->_getStoreAndNamespaceOrDefaultsFromParams($params); 
         
 # TODO: discuss that there was a cache, but that doing two tests on it to save a write into memory is questionable
 #       .... so I disabled it.

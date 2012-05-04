@@ -22,7 +22,7 @@ $TWiki::cfg{SetGetPlugin}{StoreExtension}{Storable} = '.store';
 $TWiki::cfg{SetGetPlugin}{StoreExtension}{Legacy} = '.dat';
 
 
-# **SELECT revertToDefault,all**
+# **SELECT revertToDefault,createUnknown**
 # if UndeclaredStoresBehaviour => 'revertToDefault', references to unknown stores will use the defaultStore 
 # if UndeclaredStoresBehaviour => 'createUnknown', references to an unknown storeName will create that store
 $TWiki::cfg{SetGetPlugin}{UndeclaredStoresBehaviour} = 'revertToDefault';

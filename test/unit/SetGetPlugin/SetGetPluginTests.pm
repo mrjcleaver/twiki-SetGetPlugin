@@ -81,7 +81,7 @@ my $tempStoreFile_namespaced = '/tmp/storeFile_namespaced';
 # Set up the test fixture
 sub set_up {
     my $this = shift;
-    $DB::single = 1;
+    $DB::single = 1; ## Don't delete. Comment out if necessary.
     
     $this->{DebuggedSettings} = {
                     DebugTraceSub => { 
@@ -105,8 +105,6 @@ sub set_up {
     
     
     $this->SUPER::set_up();
-    
-    $DB::single = 1;
     
     $this->{target_web} = "$this->{test_web}Target";
     $this->{target_web2} = "$this->{test_web}Target2";
@@ -401,7 +399,7 @@ sub test_loadConfigSpecDefaultConfig {
     my $keyname = subname();
     
     $this->traceInDebug(qw(_loadConfigSpec));
-    $this->breakInDebug(qw(_loadConfigSpec));
+    #$this->breakInDebug(qw(_loadConfigSpec));
 
     my $setgetplugin = new TWiki::Plugins::SetGetPlugin::Core( $this->{DebuggedSettings} );
     $this->assert("Config.spec has the right defaults");
