@@ -228,8 +228,9 @@ __Note:__ You do not need to install anything on the browser to use this plugin.
 |  Plugin Author: | TWiki:Main.PeterThoeny |
 |  Copyright: | &copy; 2010-2012 TWiki:Main.PeterThoeny <br /> &copy; 2010-2012 TWiki:TWiki.TWikiContributor |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public Licen:se]]) |
-|  Plugin Version: | 2012-01-06 |
+|  Plugin Version: | 2012-05-04 |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  2012-05-04: | internal CN beta release, built by Main.MartinCleaver of Blended Perspectives |
 |  2012-01-06: | TWikibug:Item6828: Removing write to persistent if already exists, and adding data dump -- TWiki:Main.AaronLWalker |
 |  2011-07-09: | TWikibug:Item6725: Change global package variables from "use vars" to "our" |
 |  2011-04-04: | TWikibug:Item6638: Small doc improvements |
